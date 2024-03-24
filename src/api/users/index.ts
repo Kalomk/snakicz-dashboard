@@ -1,8 +1,6 @@
 import axios from '../../core/axios';
 import { UserDataTypes } from 'snakicz-types';
 
-export const dynamic = 'force-dynamic';
-
 const getUsers = async (page: string, pageSize: string = '10') => {
   return (
     await axios.get('/users/getUsers', {

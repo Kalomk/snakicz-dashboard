@@ -5,6 +5,8 @@ import FilteredData from '@/components/filters';
 import AddProductItemForm from '@/components/products/productForm';
 import { filterSchemaProducts } from '@/schemas';
 
+export const dynamic = 'force-dynamic';
+
 const ProductPage = async () => {
   const products = await Products.getAllProducts();
 

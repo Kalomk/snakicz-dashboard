@@ -3,6 +3,8 @@ import RenderList from '@/components/RenderList';
 import FilteredData from '@/components/filters';
 import UserForm from '@/components/users/userForm';
 
+export const dynamic = 'force-dynamic';
+
 const UserPage = async () => {
   const users = await Users.getUsers('1');
   return (

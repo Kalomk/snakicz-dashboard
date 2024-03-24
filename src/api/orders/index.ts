@@ -1,8 +1,6 @@
 import axios from '../../core/axios';
 import { OrderType } from 'snakicz-types';
 
-export const dynamic = 'force-dynamic';
-
 const getOrders = async (page: string, pageSize: string = '10') => {
   return (
     await axios.get('/orders/getOrders', {

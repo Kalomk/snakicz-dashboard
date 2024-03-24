@@ -1,8 +1,6 @@
 import axios from '../../core/axios';
 import { ProductType } from 'snakicz-types';
 
-export const dynamic = 'force-dynamic';
-
 const getAllProducts = async () => {
   return (await axios.get('/products/getProducts')).data as ProductType[];
 };
