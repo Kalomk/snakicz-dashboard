@@ -5,11 +5,14 @@ import {
   CardBody,
   Heading,
   Tabs,
+  Text,
   TabPanels,
   TabPanel,
   TabList,
   Tab,
   TabIndicator,
+  useColorMode,
+  Switch,
 } from '@chakra-ui/react';
 import { useRouter, usePathname } from 'next/navigation';
 
@@ -19,6 +22,9 @@ const DasboardLayout = ({ children }: { children: React.ReactNode }) => {
     { label: 'users', name: 'клієнти' },
     { label: 'orders', name: 'замовлення' },
   ];
+
+  const { colorMode, toggleColorMode } = useColorMode();
+  const isDark = colorMode === 'dark';
   const router = useRouter();
   const pathname = usePathname();
   const currentEndpoint = pathname.split('/')[2];
@@ -29,6 +35,9 @@ const DasboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Box>
       <Card color="black">
+        <Text>Включити нічний режим</Text>
+        <Switch color="green" isChecked={isDark} onChange={toggleColorMode} />
+
         <Box>
           <Tabs defaultIndex={currentIndex} position="relative" variant="unstyled">
             <TabList>

@@ -7,10 +7,10 @@ import {
   useDisclosure,
   Drawer,
   DrawerBody,
-  DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
   Button,
+  Switch,
 } from '@chakra-ui/react';
 
 import { useRef } from 'react';
@@ -22,29 +22,27 @@ const RenderList = async ({
   dataComponent: JSX.Element;
   formComponent: JSX.Element;
 }) => {
-  // const { colorMode, toggleColorMode } = useColorMode();
-  // const isDark = colorMode === 'dark';
-  const { isOpen, onToggle, onClose, onOpen } = useDisclosure();
+  const { isOpen, onClose, onOpen } = useDisclosure();
   const btnRef = useRef(null);
 
   return (
-    <Grid templateColumns={[null, null, null, '62% 38%']} gap={4}>
-      <GridItem order={[2, 2, 2, 0, 0]} colSpan={1}>
+    <Grid templateColumns={[null, null, null, null, '62% 38%']} gap={4}>
+      <GridItem order={[2, 2, 2, 2, 0, 0]} colSpan={1}>
         {dataComponent}
       </GridItem>
+
       {/* Mobile */}
       <Button
         aria-label="Open Menu"
         size="lg"
-        m={4}
         ref={btnRef}
         onClick={onOpen}
-        display={['flex', 'flex', 'none', 'none']}
+        display={['flex', 'flex', 'flex', 'flex', 'none', 'none']}
       >
         Відкрити форму
       </Button>
       <GridItem colSpan={1}>
-        {/* <Switch color="green" isChecked={isDark} onChange={toggleColorMode} /> */}
+        <Box display={['none', 'none', 'none', 'none', 'block', 'block']}>{formComponent}</Box>
         <Drawer
           size={'full'}
           isOpen={isOpen}
@@ -52,7 +50,6 @@ const RenderList = async ({
           onClose={onClose}
           finalFocusRef={btnRef}
         >
-          <DrawerOverlay />
           <DrawerContent>
             <DrawerCloseButton marginBottom={4} />
             <DrawerBody>{formComponent}</DrawerBody>
