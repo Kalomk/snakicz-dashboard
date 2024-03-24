@@ -6,6 +6,8 @@ import {
   FaWeebly,
   FaAndroid,
   FaForward,
+  FaCalendarAlt,
+  FaSearch,
   FaBackward,
 } from 'react-icons/fa';
 import { ImCross } from 'react-icons/im';
@@ -20,4 +22,6 @@ export const Icons = {
   forward: FaForward,
   backward: FaBackward,
   delete: ImCross,
+  calendar: FaCalendarAlt,
+  search: FaSearch,
 };

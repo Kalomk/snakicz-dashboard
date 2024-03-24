@@ -35,8 +35,10 @@ const DasboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Box>
       <Card color="black">
-        <Text>Включити нічний режим</Text>
-        <Switch color="green" isChecked={isDark} onChange={toggleColorMode} />
+        <Box m={3}>
+          <Text>Включити нічний режим</Text>
+          <Switch color="green" isChecked={isDark} onChange={toggleColorMode} />
+        </Box>
 
         <Box>
           <Tabs defaultIndex={currentIndex} position="relative" variant="unstyled">

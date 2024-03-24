@@ -103,6 +103,7 @@ const AddProductItemForm: React.FC<{ productItems: ProductType[] }> = ({ product
           totalProductWeightFromProducts: values.totalProductWeightFromProducts,
           img: imgUrl.imgUrl,
           isEnable: values.isEnable,
+          totalBuyCount: 0,
         };
         await addNewProduct(newProduct);
       } catch (e) {
