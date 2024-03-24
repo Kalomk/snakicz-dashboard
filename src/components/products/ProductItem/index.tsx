@@ -28,6 +28,7 @@ const ProductItem: React.FC<CustomComponentPropsWidthProductType<ProductType>> =
     isEnable,
     description,
     category,
+    totalBuyCount,
   } = data;
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState<ProductType>({} as ProductType);
@@ -44,6 +45,7 @@ const ProductItem: React.FC<CustomComponentPropsWidthProductType<ProductType>> =
       isEnable,
       description,
       category,
+      totalBuyCount,
     });
   }, [
     img,
