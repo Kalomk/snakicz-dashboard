@@ -124,7 +124,6 @@ function FilteredData({
                       gap={4}
                       mt={8}
                       mx="auto"
-                      maxW="1400px"
                       overflowX="auto" // Use overflowX to allow horizontal overflow
                       whiteSpace="nowrap" // Prevent wrapping of grid items
                     >

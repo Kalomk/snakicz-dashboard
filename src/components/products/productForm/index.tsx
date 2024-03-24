@@ -302,29 +302,25 @@ const AddProductItemForm: React.FC<{ productItems: ProductType[] }> = ({ product
 
   return (
     <Box>
-      <Card>
-        <CardBody>
-          <Heading mb={'20px'}>Додати товар</Heading>
-          <FormControl display="flex" alignItems="center">
-            <FormLabel htmlFor="email-alerts" mb="0">
-              Чи це сет?
-            </FormLabel>
-            <Switch onChange={(e) => handleSwitchChange(e)} id="email-alerts" />
-          </FormControl>
-          <FormikProvider value={formik}>
-            <Form className="flex flex-col">
-              {postInputs.map((input) => (
-                <React.Fragment key={input.name as string}>
-                  {renderFields({ ...input })}
-                </React.Fragment>
-              ))}
-              <Button isLoading={isUploading} mt={4} type="submit">
-                Зберегти
-              </Button>
-            </Form>
-          </FormikProvider>
-        </CardBody>
-      </Card>
+      <Text fontSize={40} fontWeight={'bold'} marginY={5}>
+        Додати товар
+      </Text>
+      <FormControl display="flex" alignItems="center">
+        <FormLabel htmlFor="email-alerts" mb="0">
+          Чи це сет?
+        </FormLabel>
+        <Switch onChange={(e) => handleSwitchChange(e)} id="email-alerts" />
+      </FormControl>
+      <FormikProvider value={formik}>
+        <Form className="flex flex-col">
+          {postInputs.map((input) => (
+            <React.Fragment key={input.name as string}>{renderFields({ ...input })}</React.Fragment>
+          ))}
+          <Button isLoading={isUploading} mt={4} type="submit">
+            Зберегти
+          </Button>
+        </Form>
+      </FormikProvider>
     </Box>
   );
 };

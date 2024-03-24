@@ -29,7 +29,7 @@ const DasboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <Box>
       <Card color="black">
-        <CardBody>
+        <Box>
           <Tabs defaultIndex={currentIndex} position="relative" variant="unstyled">
             <TabList>
               {filterType.map((item) => (
@@ -42,14 +42,14 @@ const DasboardLayout = ({ children }: { children: React.ReactNode }) => {
             <TabPanels>
               {filterType.map((item) => (
                 <TabPanel key={item.label}>
-                  <Card maxH={['87vh', '85vh', '80vh']} overflow={'scroll'}>
-                    <CardBody> {children}</CardBody>
-                  </Card>
+                  <Box maxH={['87vh', '85vh', '80vh']} overflow={'scroll'}>
+                    {children}
+                  </Box>
                 </TabPanel>
               ))}
             </TabPanels>
           </Tabs>
-        </CardBody>
+        </Box>
       </Card>
     </Box>
   );
