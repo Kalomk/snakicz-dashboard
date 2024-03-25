@@ -14,7 +14,7 @@ export function LoadMore({
   data: DataTypeArr;
   setData: React.Dispatch<React.SetStateAction<DataTypeArr>>;
 }) {
-  const [page, setPage] = useState('1');
+  const [page, setPage] = useState('2');
   const [isFullLoaded, setIsFullLoaded] = useState(false);
 
   const { ref, inView } = useInView();
@@ -26,7 +26,7 @@ export function LoadMore({
     const nextPage = ((Number(page) % 7) + 1).toString();
     const newItems = (await getDataByPage(nextPage)) ?? [];
 
-    if (newItems.length === 0) {
+    if (newItems.length == 0) {
       return setIsFullLoaded(true);
     }
 

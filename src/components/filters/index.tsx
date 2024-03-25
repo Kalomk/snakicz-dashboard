@@ -1,5 +1,16 @@
 'use client';
-import { Tabs, TabPanels, TabPanel, TabList, Tab, Grid, Box, Text, Flex } from '@chakra-ui/react';
+import {
+  Tabs,
+  TabPanels,
+  TabPanel,
+  TabList,
+  Tab,
+  Grid,
+  Box,
+  Text,
+  Flex,
+  useDisclosure,
+} from '@chakra-ui/react';
 import { OrderType, UserDataTypes } from 'snakicz-types';
 import { ProductType } from 'snakicz-types';
 import ProductItem from '../products/ProductItem';
@@ -11,6 +22,8 @@ import { useState } from 'react';
 import { Orders } from '@/api/orders';
 import { filterSchemaOrders, filterSchemaProducts, filterSchemaUsers } from '@/schemas';
 import { LoadMore } from '../loadMore';
+import { Icons } from '@/entities/icons';
+import { ModalComponent } from '../modal';
 
 //types
 export type DataType = OrderType | UserDataTypes | (ProductType | undefined);
@@ -45,6 +58,10 @@ function FilteredData({
   productItems?: ProductType[];
 }) {
   const [data, setData] = useState(dataToFilter);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const CalendarMobile = Icons.calendar;
+  const SerachMobile = Icons.search;
 
   const filteredArrays = schemas[filterSchemaType].map(({ filterFunc }) =>
     data.filter(filterFunc as (data: DataType) => boolean)
@@ -72,7 +89,7 @@ function FilteredData({
       );
     }
 
-    return null;
+    return <></>;
   };
 
   //render load more component
@@ -102,7 +119,26 @@ function FilteredData({
           <Tab key={item.name}>{item.name}</Tab>
         ))}
       </TabList>
-      {renderDateRange()}
+      {filterSchemaType === 'users' || filterSchemaType === 'orders' ? (
+        <>
+          <Box display={['none', 'none', 'none', 'none', 'block', 'block']}>
+            {renderDateRange()}
+          </Box>
+          <Box
+            display={['flex', 'flex', 'flex', 'flex', 'none', 'none']}
+            justifyContent={'space-around'}
+            mt={2}
+            p={3}
+          >
+            <CalendarMobile size={22} onClick={onOpen} />
+            <ModalComponent isOpen={isOpen} onClose={onClose}>
+              {renderDateRange()}
+            </ModalComponent>
+            <SerachMobile size={22} />
+          </Box>
+        </>
+      ) : null}
+
       <TabPanels>
         {data.length === 0 || dataItems.length === 0 ? (
           <Flex alignItems={'center'} justifyContent={'center'} mt={10}>

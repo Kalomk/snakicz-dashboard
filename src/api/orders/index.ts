@@ -32,6 +32,24 @@ const deleteOrder = async (orderNumber: string) => {
 };
 
 const createOrder = async (uniqueId: string, orderData: OrderType) => {
-  return await axios.post('/orders/createOrder', { uniqueId, orderData });
+  return (await axios.post('/orders/createOrder', { uniqueId, orderData })).data as OrderType;
 };
-export const Orders = { getOrders, deleteOrder, createOrder, getOrdersByDateRange };
+
+const updateUserOrderStatusAxios = async (orderNumber: string, status: string) => {
+  try {
+    const response = (await axios.post('/orders/updateUserOrderStatus', { orderNumber, status }))
+      .data as OrderType;
+    return response;
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    throw new Error('Failed to update order status');
+  }
+};
+
+export const Orders = {
+  getOrders,
+  updateUserOrderStatusAxios,
+  deleteOrder,
+  createOrder,
+  getOrdersByDateRange,
+};

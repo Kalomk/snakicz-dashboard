@@ -23,6 +23,7 @@ import { useDisclosure } from '@chakra-ui/react';
 import { Icons } from '@/entities/icons';
 import { CustomComponentProps } from '../../../../mainTypes';
 import { Orders } from '@/api/orders';
+import { BotAPI } from '@/api/bot';
 
 const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => {
   const {
@@ -49,6 +50,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
     activePrice,
     addressPack,
     freeDelivery,
+    uniqueId,
   } = data;
   const orderItemsParsed =
     typeof orderItems === 'string'
@@ -56,6 +58,17 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
       : orderItems;
   const { isOpen, onToggle } = useDisclosure();
   const ref = useRef<any>();
+
+  const operationLabels = {
+    isConfirmationOrderSended: op_isConfirmationOrderSended
+      ? 'Підтвержено'
+      : 'Підтвердити замовлення',
+    isConfirmationPaymentSended: op_isConfirmationPaymentSended
+      ? 'Оплату підтвержено'
+      : 'Підтвердити оплату',
+    isPacNumberSended: op_isPacNumberSended ? 'Номер посилки надіслано' : 'Надіслати номер посилки',
+    isActualize: op_isActualize ? 'Актуалізовано' : 'Актуалізувати замовлення',
+  };
 
   const handleDeleteOrder = async (orderNumber: string) => {
     if (window.confirm('Ви впевнені')) {
@@ -69,6 +82,26 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
     }
   };
 
+  // Define a function to handle the button click
+  const handleButtonClick = async (
+    op1:
+      | 'isConfirmationOrderSended'
+      | 'isConfirmationPaymentSended'
+      | 'isActualize'
+      | 'isPacNumberSended',
+    uniqueId: string,
+    orderNumber: string
+  ) => {
+    try {
+      // Call the performOperations function with the provided operations
+      const status = await BotAPI.performOperations(op1, uniqueId, orderNumber);
+
+      return status;
+      // You can add any additional logic after the operations are performed
+    } catch (error) {
+      console.error('Error performing operations:', error);
+    }
+  };
   //orders come from icons
   const Icon = Icons[orderComeFrom as keyof typeof Icons];
 
@@ -205,18 +238,19 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                 </Box>
               </HStack>
               <VStack marginTop={4}>
-                <Button colorScheme="teal" variant={'outline'}>
-                  {op_isConfirmationOrderSended ? 'Підтвержено' : 'Підтвердити замовлення'}
-                </Button>
-                <Button colorScheme="teal" variant={'outline'}>
-                  {op_isConfirmationPaymentSended ? 'Оплату підтвержено' : 'Підтвердити оплату'}
-                </Button>
-                <Button colorScheme="teal" variant={'outline'}>
-                  {op_isPacNumberSended ? 'Номер посилки надіслано' : 'Надіслати номер посилки'}
-                </Button>
-                <Button colorScheme="teal" variant={'outline'}>
-                  {op_isActualize ? 'Актуалізовано' : 'Актуалізувати замовлення'}
-                </Button>
+                {Object.entries(operationLabels).map(([status, text]) => (
+                  <Button
+                    onClick={() =>
+                      handleButtonClick(
+                        status as keyof typeof operationLabels,
+                        uniqueId!,
+                        orderNumber
+                      )
+                    }
+                  >
+                    {text}
+                  </Button>
+                ))}
               </VStack>
             </Box>
           ) : (

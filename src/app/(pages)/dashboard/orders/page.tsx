@@ -11,6 +11,7 @@ const OrderPage = async () => {
     Orders.getOrders('1', '10'),
     Products.getAllProducts(),
   ]);
+
   return (
     <RenderList
       dataComponent={
