@@ -313,7 +313,7 @@ export const TotalWeightFromProduct = ({
                       >
                         {settedWeight.map((w) => {
                           const selectedProduct = findCartItem(item.title, w);
-
+                          const checkWeight = item.category === 3 ? 1 : w;
                           return (
                             <Flex
                               key={w}
@@ -323,10 +323,11 @@ export const TotalWeightFromProduct = ({
                             >
                               <Button
                                 isDisabled={
-                                  selectedProduct?.weight !== w && subValuesObj
+                                  selectedProduct?.weight !== checkWeight && subValuesObj
                                     ? item.totalWeightProduct <= subValuesObj.rightReducedValues ||
-                                      subValuesObj.rightReducedValues + w > item.totalWeightProduct
-                                    : false || item.totalWeightProduct < w
+                                      subValuesObj.rightReducedValues + checkWeight >
+                                        item.totalWeightProduct
+                                    : false || item.totalWeightProduct < checkWeight
                                 }
                                 marginTop={2}
                                 onClick={() => handleSelectWeightChange(w, item)}
@@ -350,7 +351,7 @@ export const TotalWeightFromProduct = ({
                                         !selectedProduct ||
                                         (subValuesObj
                                           ? item.totalWeightProduct <=
-                                            subValuesObj.rightReducedValues + w
+                                            subValuesObj.rightReducedValues + checkWeight
                                           : false)
                                       }
                                       size={'sm'}

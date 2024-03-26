@@ -1,9 +1,10 @@
-import { ProductType } from 'snakicz-types';
+import { CartItem, ProductType } from 'snakicz-types';
 import { countSets } from './countSets';
 
 type UpdatedWeightsType = (
   amounts: Record<string, number>,
-  products: ProductType[]
+  products: ProductType[],
+  CartItems?: CartItem[]
 ) => ProductType[];
 
 const filteredSets: UpdatedWeightsType = (amounts, products) => {
@@ -23,14 +24,29 @@ const duplicateElementsWithWeights: UpdatedWeightsType = (amounts, arr) => {
   return result;
 };
 
-const updateWeights: UpdatedWeightsType = (amounts, products) =>
-  products.map((item) => {
-    const { totalWeightProduct, ...rest } = item;
+const updateWeights: UpdatedWeightsType = (amounts, products, cartItems) => {
+  return products.map((item) => {
+    const { totalWeightProduct, totalBuyCount, ...rest } = item;
     const subtractedValue = amounts[rest.title] ?? 0;
     const updatedValue = totalWeightProduct - subtractedValue;
 
-    return { ...rest, totalWeightProduct: updatedValue };
+    let matchingCount = 0;
+
+    // Iterate over the amounts array
+    cartItems!.forEach((amount) => {
+      // Check if the title includes the amount's title property
+      if (rest.title.includes(amount.title)) {
+        // Increment the matching count by the amount's count property
+        matchingCount += amount.count;
+      }
+    });
+
+    // Calculate the updated total buy count
+    const updatedTotalBuyCount = totalBuyCount + matchingCount;
+
+    return { ...rest, totalWeightProduct: updatedValue, totalBuyCount: updatedTotalBuyCount };
   });
+};
 
 export const updateProductWeightFromProductTotalWeight: UpdatedWeightsType = (
   amounts,
