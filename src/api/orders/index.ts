@@ -47,6 +47,7 @@ const updateUserOrderStatusAxios = async (orderNumber: string, status: string) =
   try {
     const response = (await axios.post('/orders/updateUserOrderStatus', { orderNumber, status }))
       .data as OrderType;
+    console.log('res');
     return response;
   } catch (error) {
     console.error('Error updating order status:', error);
