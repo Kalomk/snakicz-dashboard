@@ -9,9 +9,10 @@ const webData = async (data: any) => {
   }
 };
 
-const confirmOrder = async (uniqueId: string) => {
+const confirmOrder = async (uniqueId: string, orderNumber: string) => {
   try {
-    await axios.post(`/bot/confirmOrder`, { uniqueId });
+    console.log(uniqueId, orderNumber);
+    await axios.post(`/bot/confirmOrder`, { uniqueId, orderNumber });
   } catch (error) {
     console.error('Error confirming order:', error);
   }
@@ -52,7 +53,7 @@ const performOperations = async (
 ) => {
   switch (op1) {
     case 'isConfirmationOrderSended':
-      await confirmOrder(uniqueId);
+      await confirmOrder(uniqueId, orderId);
       break;
     case 'isConfirmationPaymentSended':
       await paymentConfirm(uniqueId);

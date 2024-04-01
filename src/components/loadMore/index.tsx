@@ -14,7 +14,7 @@ export function LoadMore({
   data: DataTypeArr;
   setData: React.Dispatch<React.SetStateAction<DataTypeArr>>;
 }) {
-  const [page, setPage] = useState('2');
+  const [page, setPage] = useState('1');
   const [isFullLoaded, setIsFullLoaded] = useState(false);
 
   const { ref, inView } = useInView();

@@ -21,7 +21,7 @@ export function ModalComponent({
 }) {
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal size={['sm', 'sm', 'sm', 'lg']} isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalCloseButton />

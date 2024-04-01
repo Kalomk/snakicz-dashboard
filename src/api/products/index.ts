@@ -1,5 +1,5 @@
 import axios from '../../core/axios';
-import { ProductType } from 'snakicz-types';
+import { CartItem, ProductType } from 'snakicz-types';
 
 const getAllProducts = async () => {
   return (await axios.get('/products/getProducts')).data as ProductType[];
@@ -9,8 +9,19 @@ const deleteProduct = async (id: number) => {
   return await axios.post(`products/deleteProduct`, { id });
 };
 
-const updateQuantityOfProducts = async (products: ProductType[]) => {
-  return await axios.post('/products/changeQuantityOfProduct', { products });
+const updateQuantityOfProducts = async (
+  cartItems: CartItem[]
+): Promise<
+  | {
+      productsWithZeroWeight: ProductType[];
+      transaction?: undefined;
+    }
+  | {
+      transaction: ProductType[];
+      productsWithZeroWeight?: undefined;
+    }
+> => {
+  return axios.post('/products/changeQuantityOfProduct', cartItems);
 };
 
 const updateProduct = async (id: number, data: ProductType) => {

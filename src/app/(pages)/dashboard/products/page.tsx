@@ -4,10 +4,14 @@ import FilteredData from '@/components/filters';
 
 import AddProductItemForm from '@/components/products/productForm';
 import { filterSchemaProducts } from '@/schemas';
+import { checkAuth } from '@/utils/checkAuth';
 
 export const dynamic = 'force-dynamic';
 
 const ProductPage = async () => {
+  //auth check
+
+  await checkAuth();
   const products = await Products.getAllProducts();
 
   return (

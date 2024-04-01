@@ -1,3 +1,4 @@
+import { RequestCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import axios from '../../core/axios';
 import { UserDataTypes } from 'snakicz-types';
 
@@ -13,6 +14,16 @@ const getUsers = async (page: string, pageSize: string = '10') => {
 };
 const deleteUser = async (uniqueId: string) => {
   return await axios.post(`/users/userDelete`, { uniqueId });
+};
+
+const getSensetiveData = async (token: string) => {
+  return (
+    await axios.get('/getMeAdmin', {
+      headers: {
+        Authorization: token,
+      },
+    })
+  ).data;
 };
 const getUsersByDateRange = async (
   startDate: string,
@@ -46,6 +57,7 @@ const createOrFindExistUser = async (
 
 export const Users = {
   deleteUser,
+  getSensetiveData,
   createOrFindExistUser,
   getUsersByDateRange,
   getUsers,

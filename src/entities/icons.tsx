@@ -8,9 +8,12 @@ import {
   FaForward,
   FaCalendarAlt,
   FaSearch,
+  FaDownload,
   FaBackward,
 } from 'react-icons/fa';
 import { ImCross } from 'react-icons/im';
+import { CiShare2 } from 'react-icons/ci';
+import { FaRegCirclePlay } from 'react-icons/fa6';
 
 export const Icons = {
   fb: FaFacebook,
@@ -24,4 +27,7 @@ export const Icons = {
   delete: ImCross,
   calendar: FaCalendarAlt,
   search: FaSearch,
+  share: CiShare2,
+  download: FaDownload,
+  play: FaRegCirclePlay,
 };

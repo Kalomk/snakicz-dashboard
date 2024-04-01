@@ -2,7 +2,16 @@
 
 import React, { useEffect, useCallback, ChangeEvent, useState, useRef, memo } from 'react';
 import { useFormik } from 'formik';
-import { Button, Input, Select, FormControl, Checkbox, Text, Flex } from '@chakra-ui/react';
+import {
+  Button,
+  Input,
+  Select,
+  FormControl,
+  Checkbox,
+  Text,
+  Flex,
+  useToast,
+} from '@chakra-ui/react';
 import { useFormikAutoFill } from '../../../hooks/useFormikAutoFill';
 import { ActualPriceType, CartItem, OrderType, ProductType } from 'snakicz-types';
 import { FormikOrders, OrderTypeWithoutExtraFields } from '@/formik/orders';
@@ -11,8 +20,6 @@ import CountrySelector, { Countries } from './CountrySelector';
 import { CurrencySwitcher } from './CurrencyRadio';
 import { TotalWeightFromProduct } from '@/components/products/productForm/inputWeightFileds';
 import OrderComeFromRadio from './OrdersCome';
-import { updateProductWeightFromProductTotalWeight } from '@/utils/updateProductWeight';
-import { mapCartItems } from '@/utils/mapCartItems';
 import { calculateShip } from '@/utils/calcShipPrice';
 import { Users } from '@/api/users';
 import { Orders } from '@/api/orders';
@@ -28,6 +35,7 @@ const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
   const [selectedAddress, setSelectedAddress] = useState<'pack' | 'user' | 'bielsko'>('user');
   const [isLoading, setIsLoading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const toast = useToast();
 
   const formik = useFormik<OrderTypeWithoutExtraFields>({
     initialValues: FormikOrders.initialValues,
@@ -35,10 +43,9 @@ const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
     onSubmit: async (values, { resetForm }) => {
       const { userNameAndLastName, shipPrice, totalPrice, orderItems, ...rest } = values;
       const [userName, userLastName] = userNameAndLastName.split(' ');
-      const mappedItems = mapCartItems(values.orderItems as unknown as CartItem[]);
-
-      const updatedProducts = updateProductWeightFromProductTotalWeight(mappedItems, productItems);
-
+      const changeQuantityOfProductPromise = Products.updateQuantityOfProducts(
+        values.orderItems as unknown as CartItem[]
+      );
       const data: OrderType = {
         ...rest,
         userName,
@@ -47,21 +54,45 @@ const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
         totalPrice: shipPrice + values.price,
         isCatExist: includeCatPic,
       };
+      const registrationToast = toast({
+        title: 'Відправляється повідомлення',
+        description: 'Відправляється...',
+        position: 'top-right',
+      });
+      setIsLoading(true);
 
-      try {
-        setIsLoading(true);
-        const userDataUniqueId = (
-          await Users.createOrFindExistUser(values.userNickname, values.phoneNumber)
-        ).uniqueId;
-        await Orders.createOrder(userDataUniqueId, data);
-        await Products.updateQuantityOfProducts(updatedProducts);
-      } catch (error) {
-        console.error('Error sending data:', error);
-      } finally {
-        setIsLoading(false);
-        resetForm();
-        window.location.reload();
-      }
+      Products.updateQuantityOfProducts(values.orderItems as unknown as CartItem[])
+        .then(async () => {
+          const userDataUniqueId = (
+            await Users.createOrFindExistUser(values.userNickname, values.phoneNumber)
+          ).uniqueId;
+          Orders.createOrder(userDataUniqueId, data);
+        })
+        .then(async () => {
+          if ((await changeQuantityOfProductPromise).productsWithZeroWeight === undefined) {
+            toast.close(registrationToast);
+            toast({
+              title: 'Замовлення оформлено успішно',
+              description: 'Замовлення оформлено успішно',
+              position: 'top-right',
+              status: 'success',
+            });
+            setIsLoading(false);
+            resetForm();
+            window.location.reload();
+          }
+        })
+        .catch(async (error) => {
+          toast.close(registrationToast);
+          toast({
+            title: 'Замовлення не прийнято',
+            description: `${error.response.data?.join(',')}`,
+            position: 'top-right',
+            status: 'error',
+          });
+          setIsLoading(false);
+          console.error('Error sending data:', error);
+        });
     },
   });
 

@@ -1,6 +1,10 @@
 import axios from '../../core/axios';
-import { OrderType } from 'snakicz-types';
+import { OrderComeFromType, OrderType } from 'snakicz-types';
 
+interface ChartComponentInterface {
+  orderComeFrom: OrderComeFromType;
+  _count: number;
+}
 const getOrders = async (page: string, pageSize: string = '10') => {
   return (
     await axios.get('/orders/getOrders', {
@@ -35,6 +39,10 @@ const createOrder = async (uniqueId: string, orderData: OrderType) => {
   return (await axios.post('/orders/createOrder', { uniqueId, orderData })).data as OrderType;
 };
 
+const getOrderCountsByType = async () => {
+  return (await axios.get('/orders/getOrderCountsByType')).data as ChartComponentInterface[];
+};
+
 const updateUserOrderStatusAxios = async (orderNumber: string, status: string) => {
   try {
     const response = (await axios.post('/orders/updateUserOrderStatus', { orderNumber, status }))
@@ -52,4 +60,5 @@ export const Orders = {
   deleteOrder,
   createOrder,
   getOrdersByDateRange,
+  getOrderCountsByType,
 };

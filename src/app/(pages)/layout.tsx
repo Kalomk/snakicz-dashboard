@@ -21,6 +21,7 @@ const DasboardLayout = ({ children }: { children: React.ReactNode }) => {
     { label: 'products', name: 'товари' },
     { label: 'users', name: 'клієнти' },
     { label: 'orders', name: 'замовлення' },
+    { label: 'analitics', name: 'аналітика' },
   ];
 
   const { colorMode, toggleColorMode } = useColorMode();
@@ -43,11 +44,20 @@ const DasboardLayout = ({ children }: { children: React.ReactNode }) => {
         <Box>
           <Tabs defaultIndex={currentIndex} position="relative" variant="unstyled">
             <TabList>
-              {filterType.map((item) => (
-                <Tab onClick={() => router.push(`/dashboard/${item.label}`)} key={item.name}>
-                  {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
-                </Tab>
-              ))}
+              {filterType.map((item) => {
+                if (item.label === 'analitics') {
+                  return (
+                    <Tab onClick={() => router.push(`/${item.label}`)} key={item.name}>
+                      {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
+                    </Tab>
+                  );
+                }
+                return (
+                  <Tab onClick={() => router.push(`/dashboard/${item.label}`)} key={item.name}>
+                    {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
+                  </Tab>
+                );
+              })}
             </TabList>
             <TabIndicator mt="-1.5px" height="2px" bg="blue.500" borderRadius="1px" />
             <TabPanels>

@@ -15,3 +15,9 @@ export type FilterSchemaType<Y> = {
 export interface FilterFuncType<Y> {
   filterFunc: (data: Y) => boolean;
 }
+export type Concat<T extends string[]> = T extends [
+  infer F extends string,
+  ...infer R extends string[]
+]
+  ? `${F}${Concat<R>}`
+  : '';

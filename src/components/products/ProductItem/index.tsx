@@ -90,6 +90,8 @@ const ProductItem: React.FC<CustomComponentPropsWidthProductType<ProductType>> =
     return isEditing ? edited : stable;
   };
 
+  const checkIfSet = (category: number) => (category === 3 ? 'шт' : 'г');
+
   const handleChange = (
     e: ChangeEvent<HTMLSelectElement> | ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     index?: number
@@ -323,7 +325,7 @@ const ProductItem: React.FC<CustomComponentPropsWidthProductType<ProductType>> =
               defaultValue={totalWeightProduct}
             />
           ),
-          stable: ` Вага: ${totalWeightProduct} г`,
+          stable: ` Вага: ${totalWeightProduct} ${checkIfSet(category)}`,
         })}
       </Box>
       <Box wordBreak={'break-all'} mt={2} fontSize="lg" textAlign="center">

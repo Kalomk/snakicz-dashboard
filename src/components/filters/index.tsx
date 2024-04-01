@@ -18,7 +18,7 @@ import UserComponent from '../users/UserItem';
 import OrderComponent from '../orders/OrderItem';
 import DateRangeComponent from './selectDataByRange';
 import { Users } from '@/api/users';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Orders } from '@/api/orders';
 import { filterSchemaOrders, filterSchemaProducts, filterSchemaUsers } from '@/schemas';
 import { LoadMore } from '../loadMore';

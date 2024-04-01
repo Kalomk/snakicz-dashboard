@@ -324,7 +324,7 @@ export const TotalWeightFromProduct = ({
                               <Button
                                 isDisabled={
                                   selectedProduct?.weight !== checkWeight && subValuesObj
-                                    ? item.totalWeightProduct <= subValuesObj.rightReducedValues ||
+                                    ? item.totalWeightProduct < subValuesObj.rightReducedValues ||
                                       subValuesObj.rightReducedValues + checkWeight >
                                         item.totalWeightProduct
                                     : false || item.totalWeightProduct < checkWeight
