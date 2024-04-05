@@ -9,7 +9,7 @@ const deleteProduct = async (id: number) => {
   return await axios.post(`products/deleteProduct`, { id });
 };
 
-const updateQuantityOfProducts = async (
+const minusQuantityOfProducts = async (
   cartItems: CartItem[]
 ): Promise<
   | {
@@ -21,7 +21,11 @@ const updateQuantityOfProducts = async (
       productsWithZeroWeight?: undefined;
     }
 > => {
-  return axios.post('/products/changeQuantityOfProduct', cartItems);
+  return axios.post('/products/minusQuantityOfProduct', cartItems);
+};
+
+const addQuantityOfProducts = async (cartItems: CartItem[]) => {
+  return axios.post('products/addQuantityOfProduct', cartItems);
 };
 
 const updateProduct = async (id: number, data: ProductType) => {
@@ -37,5 +41,6 @@ export const Products = {
   deleteProduct,
   updateProduct,
   addNewProduct,
-  updateQuantityOfProducts,
+  addQuantityOfProducts,
+  minusQuantityOfProducts,
 };

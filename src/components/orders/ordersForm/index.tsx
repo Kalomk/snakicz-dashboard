@@ -43,7 +43,7 @@ const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
     onSubmit: async (values, { resetForm }) => {
       const { userNameAndLastName, shipPrice, totalPrice, orderItems, ...rest } = values;
       const [userName, userLastName] = userNameAndLastName.split(' ');
-      const changeQuantityOfProductPromise = Products.updateQuantityOfProducts(
+      const changeQuantityOfProductPromise = Products.minusQuantityOfProducts(
         values.orderItems as unknown as CartItem[]
       );
       const data: OrderType = {
@@ -61,7 +61,7 @@ const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
       });
       setIsLoading(true);
 
-      Products.updateQuantityOfProducts(values.orderItems as unknown as CartItem[])
+      Products.minusQuantityOfProducts(values.orderItems as unknown as CartItem[])
         .then(async () => {
           const userDataUniqueId = (
             await Users.createOrFindExistUser(values.userNickname, values.phoneNumber)
@@ -139,7 +139,7 @@ const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
   };
 
   const handleTransformData = (data: CartItem[]) => {
-    const calcPrice = data.reduce((acc, val) => acc + val.price, 0);
+    const calcPrice = data.reduce((acc, val) => acc + val.price * val.count, 0);
     const calcWeight = data.reduce((acc, val) => acc + val.weight * val.count, 0);
     const activePrice = formik.values.activePrice;
 

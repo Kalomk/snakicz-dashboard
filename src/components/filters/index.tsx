@@ -18,7 +18,7 @@ import UserComponent from '../users/UserItem';
 import OrderComponent from '../orders/OrderItem';
 import DateRangeComponent from './selectDataByRange';
 import { Users } from '@/api/users';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Orders } from '@/api/orders';
 import { filterSchemaOrders, filterSchemaProducts, filterSchemaUsers } from '@/schemas';
 import { LoadMore } from '../loadMore';
@@ -114,30 +114,32 @@ function FilteredData({
 
   return (
     <Tabs variant="enclosed" position="relative">
-      <TabList flexWrap={'wrap'}>
-        {schemas[filterSchemaType].map((item) => (
-          <Tab key={item.name}>{item.name}</Tab>
-        ))}
-      </TabList>
-      {filterSchemaType === 'users' || filterSchemaType === 'orders' ? (
-        <>
-          <Box display={['none', 'none', 'none', 'none', 'block', 'block']}>
-            {renderDateRange()}
-          </Box>
-          <Box
-            display={['flex', 'flex', 'flex', 'flex', 'none', 'none']}
-            justifyContent={'space-around'}
-            mt={2}
-            p={3}
-          >
-            <CalendarMobile size={22} onClick={onOpen} />
-            <ModalComponent isOpen={isOpen} onClose={onClose}>
+      <Box pos={'sticky'}>
+        <TabList flexWrap={'wrap'}>
+          {schemas[filterSchemaType].map((item) => (
+            <Tab key={item.name}>{item.name}</Tab>
+          ))}
+        </TabList>
+        {filterSchemaType === 'users' || filterSchemaType === 'orders' ? (
+          <>
+            <Box display={['none', 'none', 'none', 'none', 'block', 'block']}>
               {renderDateRange()}
-            </ModalComponent>
-            <SerachMobile size={22} />
-          </Box>
-        </>
-      ) : null}
+            </Box>
+            <Box
+              display={['flex', 'flex', 'flex', 'flex', 'none', 'none']}
+              justifyContent={'space-around'}
+              mt={2}
+              p={3}
+            >
+              <CalendarMobile size={22} onClick={onOpen} />
+              <ModalComponent isOpen={isOpen} onClose={onClose}>
+                {renderDateRange()}
+              </ModalComponent>
+              <SerachMobile size={22} />
+            </Box>
+          </>
+        ) : null}
+      </Box>
 
       <TabPanels>
         {data.length === 0 || dataItems.length === 0 ? (

@@ -18,6 +18,7 @@ import {
   HStack,
   VStack,
   useToast,
+  Input,
 } from '@chakra-ui/react';
 import { OrderType, CartItem } from 'snakicz-types';
 import { useDisclosure } from '@chakra-ui/react';
@@ -27,6 +28,8 @@ import { Orders } from '@/api/orders';
 import { BotAPI } from '@/api/bot';
 import { ModalZoomedItem } from './zoomedModal';
 import AudioPlayer from './audioComponent';
+import { ModalComponent } from '@/components/modal';
+import { Products } from '@/api/products';
 
 const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => {
   const {
@@ -55,10 +58,15 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
     typeof orderItems === 'string'
       ? (JSON.parse(orderItems as unknown as string) as CartItem[])
       : orderItems;
+
+  //open cart list
   const { isOpen, onToggle } = useDisclosure();
   const [orderStatus, setOrderStatus] = useState<OrderType>();
+  const [postData, setPostData] = useState({ postService: '', postNumber: '' });
   const ref = useRef<any>();
   const toast = useToast();
+
+  //open modals funcs
   const {
     isOpen: isModalOpenCatPic,
     onClose: onCloseModalCatPic,
@@ -71,9 +79,20 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
   } = useDisclosure();
 
   const {
+    isOpen: isModalOpenSendConfirmation,
+    onClose: onCloseModalSendConfirmation,
+    onOpen: onOpenModalSendConfirmation,
+  } = useDisclosure();
+
+  const {
     isOpen: isModalOpenAudio,
     onClose: onCloseModalAudio,
     onOpen: onOpenModalAudio,
+  } = useDisclosure();
+  const {
+    isOpen: isModalOpenDelete,
+    onClose: onCloseModalDelete,
+    onOpen: onOpenModalDelete,
   } = useDisclosure();
 
   const operationLabels = {
@@ -93,15 +112,14 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
     isActualize: 'Актуалізувано користувача',
   };
 
-  const handleDeleteOrder = async (orderNumber: string) => {
-    if (window.confirm('Ви впевнені')) {
-      try {
-        await Orders.deleteOrder(orderNumber);
-      } catch (e) {
-        console.log(e);
-      } finally {
-        window.location.reload();
-      }
+  const handleDeleteOrder = async (orderNumber: string, cartItems: CartItem[]) => {
+    try {
+      await Orders.deleteOrder(orderNumber);
+      await Products.addQuantityOfProducts(cartItems);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      window.location.reload();
     }
   };
 
@@ -113,11 +131,19 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
       | 'isActualize'
       | 'isPacNumberSended',
     uniqueId: string,
-    orderNumber: string
+    orderNumber: string,
+    postNumber?: string,
+    postService?: string
   ) => {
     try {
       // Call the performOperations function with the provided operations
-      const statusPromiseObject = BotAPI.performOperations(op1, uniqueId, orderNumber);
+      const statusPromiseObject = BotAPI.performOperations(
+        op1,
+        uniqueId,
+        orderNumber,
+        postNumber!,
+        postService!
+      );
 
       toast.promise(statusPromiseObject, {
         success: {
@@ -153,6 +179,128 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
   const IconDelete = Icons.delete;
   const AudioPlay = Icons.play;
 
+  const renderModalCat = () => {
+    return (
+      <>
+        {catExistConfirmPicUrl !== '' && (
+          <ModalZoomedItem
+            fileUrl={catExistConfirmPicUrl!}
+            isOpen={isModalOpenCatPic}
+            onClose={onCloseModalCatPic}
+          >
+            <Image
+              width={'95%'}
+              height={'100%'}
+              src={catExistConfirmPicUrl !== '' ? catExistConfirmPicUrl! : catPicThumbNail.src}
+              alt="cat"
+            />
+          </ModalZoomedItem>
+        )}
+      </>
+    );
+  };
+
+  const renderPaymentModal = () => {
+    return (
+      <>
+        {paymentConfirmPicUrl !== '' && (
+          <ModalZoomedItem
+            fileUrl={paymentConfirmPicUrl!}
+            isOpen={isModalOpenPayment}
+            onClose={onCloseModalPayment}
+          >
+            <Image
+              width={'95%'}
+              height={'100%'}
+              maxWidth={'300px'}
+              maxHeight={'350px'}
+              src={paymentConfirmPicUrl !== '' ? paymentConfirmPicUrl! : paymentPicThumbNail.src}
+              alt="payment"
+            />
+          </ModalZoomedItem>
+        )}
+      </>
+    );
+  };
+
+  const renderAudioModal = () => {
+    return (
+      <>
+        <ModalZoomedItem
+          type="audio"
+          fileUrl={specialOcasionAudioUrl!}
+          isOpen={isModalOpenAudio}
+          onClose={onCloseModalAudio}
+        >
+          <AudioPlayer src={specialOcasionAudioUrl!} />
+        </ModalZoomedItem>
+      </>
+    );
+  };
+  const renderInputModal = () => {
+    return (
+      <ModalComponent onClose={onCloseModalSendConfirmation} isOpen={isModalOpenSendConfirmation}>
+        <Flex flexDirection={'column'} alignContent={'center'} justifyContent={'center'}>
+          <Input
+            value={postData.postService}
+            onChange={(e) => setPostData((prev) => ({ ...prev, postService: e.target.value }))}
+            placeholder="Сервіс відправки"
+          />
+          <Input
+            value={postData.postNumber}
+            onChange={(e) => setPostData((prev) => ({ ...prev, postNumber: e.target.value }))}
+            placeholder="Номер посилки"
+          />
+          <Button
+            onClick={() =>
+              handleButtonClick(
+                'isPacNumberSended',
+                uniqueId!,
+                orderNumber,
+                postData.postNumber,
+                postData.postService
+              )
+            }
+          >
+            Відправити
+          </Button>
+        </Flex>
+      </ModalComponent>
+    );
+  };
+
+  const renderDeleteModal = () => {
+    return (
+      <ModalComponent onClose={onCloseModalDelete} isOpen={isModalOpenDelete}>
+        <Flex p={10} flexDirection={'column'} alignContent={'center'} justifyContent={'center'}>
+          <Box textAlign={'center'}>
+            <Text fontSize={20}>Видалити замовлення?</Text>
+          </Box>
+          <Button mt={5} onClick={onCloseModalDelete}>
+            Ні, не видаляти
+          </Button>
+          <Button
+            mt={6}
+            colorScheme="red"
+            onClick={() => handleDeleteOrder(orderNumber, orderItemsParsed)}
+          >
+            Так, видалити
+          </Button>
+        </Flex>
+      </ModalComponent>
+    );
+  };
+
+  //static stats
+  const staticPaymentStatus =
+    orderStatus && orderStatus.op_isConfirmationPaymentSended !== undefined
+      ? orderStatus.op_isConfirmationPaymentSended
+      : data.op_isConfirmationPaymentSended;
+  const staticEmailSendStatus =
+    orderStatus && orderStatus.op_isPacNumberSended !== undefined
+      ? orderStatus.op_isPacNumberSended
+      : data.op_isPacNumberSended;
+
   return (
     <Box whiteSpace={'normal'} p={4} borderWidth="1px" borderRadius="lg">
       {' '}
@@ -176,7 +324,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
       >
         <FrontSide style={{ minHeight: '420px' }}>
           <HStack justifyContent={'space-between'}>
-            <Button colorScheme="red" width={'30px'} onClick={() => handleDeleteOrder(orderNumber)}>
+            <Button colorScheme="red" width={'30px'} onClick={onOpenModalDelete}>
               <IconDelete />
             </Button>
             <Button
@@ -261,24 +409,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                     }
                     alt="cat"
                   />
-                  {catExistConfirmPicUrl !== '' && (
-                    <ModalZoomedItem
-                      fileUrl={catExistConfirmPicUrl!}
-                      isOpen={isModalOpenCatPic}
-                      onClose={onCloseModalCatPic}
-                    >
-                      <Image
-                        width={'95%'}
-                        height={'100%'}
-                        src={
-                          catExistConfirmPicUrl !== ''
-                            ? catExistConfirmPicUrl!
-                            : catPicThumbNail.src
-                        }
-                        alt="cat"
-                      />
-                    </ModalZoomedItem>
-                  )}
+
                   <Text color={catExistConfirmPicUrl !== '' ? 'green' : 'red'}>
                     {' '}
                     {catExistConfirmPicUrl !== '' ? 'є фото' : 'нема фото'}
@@ -294,26 +425,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                     }
                     alt="payment"
                   />
-                  {paymentConfirmPicUrl !== '' && (
-                    <ModalZoomedItem
-                      fileUrl={paymentConfirmPicUrl!}
-                      isOpen={isModalOpenPayment}
-                      onClose={onCloseModalPayment}
-                    >
-                      <Image
-                        width={'95%'}
-                        height={'100%'}
-                        maxWidth={'300px'}
-                        maxHeight={'350px'}
-                        src={
-                          paymentConfirmPicUrl !== ''
-                            ? paymentConfirmPicUrl!
-                            : paymentPicThumbNail.src
-                        }
-                        alt="payment"
-                      />
-                    </ModalZoomedItem>
-                  )}
+
                   <Text color={paymentConfirmPicUrl !== '' ? 'green' : 'red'}>
                     {' '}
                     {paymentConfirmPicUrl !== '' ? 'є фото' : 'нема фото'}
@@ -325,16 +437,6 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                   <AudioPlay />
                 </Button>
               </Flex>
-
-              <ModalZoomedItem
-                type="audio"
-                fileUrl={specialOcasionAudioUrl!}
-                isOpen={isModalOpenAudio}
-                onClose={onCloseModalAudio}
-              >
-                <AudioPlayer src={specialOcasionAudioUrl!} />
-              </ModalZoomedItem>
-
               <VStack marginTop={4}>
                 {Object.entries(operationLabels).map(([status, text]) => {
                   const s = `op_${status}` as Concat<['op_', keyof typeof operationLabels]>;
@@ -344,12 +446,15 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                     <Button
                       colorScheme={'green'}
                       variant={stats ? 'solid' : 'outline'}
-                      onClick={() =>
-                        handleButtonClick(
-                          status as keyof typeof operationLabels,
-                          uniqueId!,
-                          orderNumber
-                        )
+                      onClick={
+                        status === 'isPacNumberSended'
+                          ? onOpenModalSendConfirmation
+                          : () =>
+                              handleButtonClick(
+                                status as keyof typeof operationLabels,
+                                uniqueId!,
+                                orderNumber
+                              )
                       }
                     >
                       {text(stats!)}
@@ -359,10 +464,30 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
               </VStack>
             </Box>
           ) : (
-            <Box>hy</Box>
+            <Box mt={20}>
+              <Flex
+                mt={2}
+                flexDirection={'column'}
+                alignContent={'center'}
+                justifyContent={'center'}
+                gap={5}
+              >
+                <Button colorScheme={'green'} variant={staticPaymentStatus ? 'solid' : 'outline'}>
+                  Відмітити як оплачений
+                </Button>
+                <Button colorScheme={'green'} variant={staticEmailSendStatus ? 'solid' : 'outline'}>
+                  <Text whiteSpace={'normal'}> Надіслати підтвердження на пошту</Text>
+                </Button>
+              </Flex>
+            </Box>
           )}
         </BackSide>
       </Flippy>
+      {renderModalCat()}
+      {renderPaymentModal()}
+      {renderAudioModal()}
+      {renderInputModal()}
+      {renderDeleteModal()}
     </Box>
   );
 };
