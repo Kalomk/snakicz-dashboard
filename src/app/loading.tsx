@@ -4,8 +4,8 @@ import { Box, Flex } from '@chakra-ui/react';
 
 const Loader = () => {
   return (
-    <Flex minWidth="max-content" alignItems="center">
-      <Box m={'auto'} className="animate-pulse">
+    <Flex m={'auto'} minWidth="max-content" alignItems="center">
+      <Box className="animate-pulse">
         <Image
           src={logo}
           alt="logo"

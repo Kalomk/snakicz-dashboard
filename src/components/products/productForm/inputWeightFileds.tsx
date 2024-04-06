@@ -307,17 +307,22 @@ export const TotalWeightFromProduct = ({
       <Box>
         <Box>
           <HStack wrap={'wrap'}>
-            {filterSchemaProducts.map((btn) => (
-              <Button
-                colorScheme={'green'}
-                variant={schema.name === btn.name ? 'solid' : 'outline'}
-                onClick={() => {
-                  setSchema(btn);
-                }}
-              >
-                {btn.name}
-              </Button>
-            ))}
+            {filterSchemaProducts.map((btn) => {
+              if (type === 'col' && btn.name === 'Сети') {
+                return null;
+              }
+              return (
+                <Button
+                  colorScheme={'green'}
+                  variant={schema.name === btn.name ? 'solid' : 'outline'}
+                  onClick={() => {
+                    setSchema(btn);
+                  }}
+                >
+                  {btn.name}
+                </Button>
+              );
+            })}
           </HStack>
         </Box>
         {rightProductsArray.filter(schema.filterFunc).map((item) => {
