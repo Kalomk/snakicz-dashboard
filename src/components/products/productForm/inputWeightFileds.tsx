@@ -371,17 +371,19 @@ export const TotalWeightFromProduct = ({
                         >
                           {w}
                         </Button>
-                        <FormControl mt={2}>
-                          <Flex justifyContent={'center'} alignContent={'center'}>
-                            <FormLabel>Окремо?</FormLabel>
-                            <Checkbox
-                              isDisabled={!selectedProduct}
-                              onChange={(e) =>
-                                onHandleChangeIsDivided(e.target.checked, selectedProduct!)
-                              }
-                            />
-                          </Flex>
-                        </FormControl>
+                        {type === 'cart' ? (
+                          <FormControl mt={2}>
+                            <Flex justifyContent={'center'} alignContent={'center'}>
+                              <FormLabel>Окремо?</FormLabel>
+                              <Checkbox
+                                isDisabled={!selectedProduct}
+                                onChange={(e) =>
+                                  onHandleChangeIsDivided(e.target.checked, selectedProduct!)
+                                }
+                              />
+                            </Flex>
+                          </FormControl>
+                        ) : null}
                         {type === 'cart' ? (
                           <VStack marginTop={4} align="center">
                             <HStack>
