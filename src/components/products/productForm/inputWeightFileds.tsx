@@ -22,6 +22,7 @@ import { SmallAddIcon } from '@chakra-ui/icons';
 import { useEffect, useState } from 'react';
 import { ActualPriceType, CartItem, ProductType } from 'snakicz-types';
 import { Countries } from '../../orders/ordersForm/CountrySelector';
+import { filterSchemaProducts } from '@/schemas';
 
 //types
 type NewInputCheckBoxValueType = PostInput & CheckboxItemsProps;
@@ -61,7 +62,8 @@ class ProductTransformer {
   constructor(
     private activeCountry: Countries,
     private activePrice: 'zł' | '\u20AC',
-    private currentWeight: number
+    private currentWeight: number,
+    private isDivided: boolean
   ) {}
 
   transformToCartItem(product: ProductType): CartItem {
@@ -76,6 +78,7 @@ class ProductTransformer {
       count: 1, // You can set the default count as needed
       activePrice: this.activePrice,
       activeCountry: this.activeCountry,
+      isDivided: this.isDivided,
     };
   }
 }
@@ -216,12 +219,17 @@ export const TotalWeightFromProduct = ({
     return foundedItem;
   };
 
-  const handleSelectWeightChange = (selected: number, item: ProductType) => {
+  const handleSelectWeightChange = (
+    selected: number,
+    item: ProductType,
+    isDivided: boolean = false
+  ) => {
     //initialize object
     const cartItem = new ProductTransformer(
       activeCountry,
       activePrice,
-      selected
+      selected,
+      isDivided
     ).transformToCartItem(item);
 
     const newArray = type === 'col' ? products.filter((p) => p.title !== item.title) : products;
@@ -251,7 +259,6 @@ export const TotalWeightFromProduct = ({
     }));
   };
   const checkIfSet = (category: number) => (category === 3 ? 'шт' : 'г');
-
   //calculate total subtracted values
 
   const calculateTotalSubtractedValues = (title: string, category: number) => {
@@ -274,6 +281,134 @@ export const TotalWeightFromProduct = ({
 
     return null;
   };
+
+  //change isDivided property
+  const onHandleChangeIsDivided = (value: boolean, cartItem: CartItem) => {
+    const newArray = [...products];
+
+    //find index
+    const existingItemIndex = newArray.findIndex(
+      (obj) => obj.title === cartItem.title && obj.weight === cartItem.weight
+    );
+
+    newArray[existingItemIndex].isDivided = value;
+
+    setProducts(newArray);
+    setData(newArray);
+  };
+
+  //cart picker
+
+  // const CartItemPicker = () => {
+  //   return (
+  //     <Box>
+  //       <Box>
+  //         <HStack wrap={'wrap'}>
+  //           {filterSchemaProducts.map((btn) => (
+  //             <Button>{btn.name}</Button>
+  //           ))}
+  //         </HStack>
+  //       </Box>
+  //       {rightProductsArray.map((item) => {
+  //         const rightWeight =
+  //           productWeightsMap[item.title] != undefined
+  //             ? productWeightsMap[item.title]
+  //             : item.weight;
+
+  //         const settedWeight = [...new Set(rightWeight)];
+  //         const subValuesObj = calculateTotalSubtractedValues(item.title, item.category);
+  //         return (
+  //           <ListItem key={item.id} display="flex" alignItems="center">
+  //             <Image src={item.img} alt={item.title} boxSize="50px" mr={4} />
+  //             <Flex flexDirection={'column'} alignItems={'center'} justifyContent={'center'}>
+  //               <Text marginBottom={2} fontWeight={'800'} textAlign={'center'}>
+  //                 {item.title}
+  //               </Text>
+  //               <Flex gap={2} justifyContent={'center'} alignContent={'center'}>
+  //                 <Text marginBottom={2} fontWeight={'500'} textAlign={'center'}>
+  //                   {item.totalWeightProduct} {checkIfSet(item.category)}
+  //                 </Text>
+  //                 {subValuesObj && subValuesObj.component}
+  //               </Flex>
+  //               <Flex gap={2} flexWrap={'wrap'} justifyContent={'center'} alignContent={'center'}>
+  //                 {settedWeight.map((w) => {
+  //                   const selectedProduct = findCartItem(item.title, w);
+  //                   const checkWeight = item.category === 3 ? 1 : w;
+  //                   return (
+  //                     <Flex
+  //                       key={w}
+  //                       alignItems={'center'}
+  //                       justifyContent={'center'}
+  //                       flexDirection={'column'}
+  //                     >
+  //                       <Button
+  //                         isDisabled={
+  //                           selectedProduct?.weight !== checkWeight && subValuesObj
+  //                             ? item.totalWeightProduct < subValuesObj.rightReducedValues ||
+  //                               subValuesObj.rightReducedValues + checkWeight >
+  //                                 item.totalWeightProduct
+  //                             : false || item.totalWeightProduct < checkWeight
+  //                         }
+  //                         marginTop={2}
+  //                         onClick={() => handleSelectWeightChange(w, item)}
+  //                         colorScheme={selectedProduct?.weight === w ? 'teal' : 'gray'}
+  //                       >
+  //                         {w}
+  //                       </Button>
+  //                       <FormControl mt={2}>
+  //                         <Flex justifyContent={'center'} alignContent={'center'}>
+  //                           <FormLabel>Окремо?</FormLabel>
+  //                           <Checkbox
+  //                             isDisabled={!selectedProduct}
+  //                             onChange={(e) =>
+  //                               onHandleChangeIsDivided(e.target.checked, selectedProduct!)
+  //                             }
+  //                           />
+  //                         </Flex>
+  //                       </FormControl>
+  //                       {type === 'cart' ? (
+  //                         <VStack marginTop={4} align="center">
+  //                           <HStack>
+  //                             <Button
+  //                               isDisabled={!selectedProduct || selectedProduct.count < 2}
+  //                               size={'sm'}
+  //                               onClick={() => incrementOrDecrement('dec', selectedProduct!)}
+  //                             >
+  //                               -
+  //                             </Button>
+  //                             <Text>{selectedProduct?.count ?? 0}</Text>
+  //                             <Button
+  //                               isDisabled={
+  //                                 !selectedProduct ||
+  //                                 (subValuesObj
+  //                                   ? item.totalWeightProduct <=
+  //                                     subValuesObj.rightReducedValues + checkWeight
+  //                                   : false)
+  //                               }
+  //                               size={'sm'}
+  //                               onClick={() => incrementOrDecrement('inc', selectedProduct!)}
+  //                             >
+  //                               +
+  //                             </Button>
+  //                           </HStack>
+  //                         </VStack>
+  //                       ) : null}
+  //                     </Flex>
+  //                   );
+  //                 })}
+  //               </Flex>
+  //               <Box as="div" marginTop={2}>
+  //                 <InputWeightList
+  //                   setValue={(newV) => handleProductWeightChange(item.title, rightWeight, newV)}
+  //                 />
+  //               </Box>
+  //             </Flex>
+  //           </ListItem>
+  //         );
+  //       })}
+  //     </Box>
+  //   );
+  // };
 
   return (
     <FormControl mt={5} id={`${name}-id`}>
@@ -335,6 +470,17 @@ export const TotalWeightFromProduct = ({
                               >
                                 {w}
                               </Button>
+                              <FormControl mt={2}>
+                                <Flex justifyContent={'center'} alignContent={'center'}>
+                                  <FormLabel>Окремо?</FormLabel>
+                                  <Checkbox
+                                    isDisabled={!selectedProduct}
+                                    onChange={(e) =>
+                                      onHandleChangeIsDivided(e.target.checked, selectedProduct!)
+                                    }
+                                  />
+                                </Flex>
+                              </FormControl>
                               {type === 'cart' ? (
                                 <VStack marginTop={4} align="center">
                                   <HStack>

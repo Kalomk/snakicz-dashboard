@@ -227,7 +227,6 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
     return (
       <>
         <ModalZoomedItem
-          type="audio"
           fileUrl={specialOcasionAudioUrl!}
           isOpen={isModalOpenAudio}
           onClose={onCloseModalAudio}
@@ -363,7 +362,12 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                 >
                   <Image src={item.imageUrl} alt={item.title} boxSize="50px" mr={4} />
                   <Box>
-                    <Text>{item.title}</Text>
+                    <Text>
+                      {item.title}{' '}
+                      <Text as="span" color={'red'}>
+                        {item.isDivided ? '(окремо)' : ''}
+                      </Text>
+                    </Text>
                     <Text>{`${item.weight}г | ${item.price} ${item.activePrice}`}</Text>
                     <Text>{`Кількість: ${item.count}`}</Text>
                   </Box>

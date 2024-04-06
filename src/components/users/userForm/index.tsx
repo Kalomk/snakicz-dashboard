@@ -2,7 +2,15 @@
 
 import React from 'react';
 import { Formik, Form, Field } from 'formik';
-import { Button, FormControl, FormLabel, Input, FormErrorMessage, Box } from '@chakra-ui/react';
+import {
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  FormErrorMessage,
+  Box,
+  Text,
+} from '@chakra-ui/react';
 import { UserDataTypes } from 'snakicz-types'; // Importing UserDataTypes interface
 import { FormikUsers } from '@/formik/users';
 import { Users } from '@/api/users';
@@ -14,6 +22,9 @@ const UserForm: React.FC = () => {
 
   return (
     <Box>
+      <Text fontSize={40} fontWeight={'bold'} marginY={5}>
+        Додати товар
+      </Text>
       <Formik
         initialValues={FormikUsers.initialValues}
         validationSchema={FormikUsers.validationSchema}

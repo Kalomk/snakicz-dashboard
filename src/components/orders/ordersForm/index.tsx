@@ -376,6 +376,9 @@ const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
 
   return (
     <div className="form-wrapper">
+      <Text fontSize={40} fontWeight={'bold'} marginY={5}>
+        Додати товар
+      </Text>
       <div className="form">
         {inputFields.slice(0, 4).map(renderFields)}
         <Select

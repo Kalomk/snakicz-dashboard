@@ -9,13 +9,11 @@ export const ModalZoomedItem = ({
   onClose,
   children,
   fileUrl,
-  type = 'img',
 }: {
   isOpen: boolean;
   onClose(): void;
   children: JSX.Element;
   fileUrl: string;
-  type?: 'img' | 'audio';
 }) => {
   const DownloadIcon = Icons.download;
   const ShareIcon = Icons.share;
@@ -23,8 +21,8 @@ export const ModalZoomedItem = ({
   // Function to handle file download
   const handleDownload = async () => {
     try {
-      const whatType = type === 'img' ? 'image.jpg' : 'audio.mp3';
-      FileSaver.saveAs(fileUrl, whatType);
+      const whatExt = fileUrl.split('.').pop();
+      FileSaver.saveAs(fileUrl, `file.${whatExt}`);
     } catch (error) {
       console.error('Error downloading file:', error);
     }
