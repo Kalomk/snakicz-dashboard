@@ -287,6 +287,7 @@ export const TotalWeightFromProduct = ({
   const onHandleChangeIsDivided = (value: boolean, cartItem: CartItem) => {
     const newArray = [...products];
 
+    console.log('1');
     //find index
     const existingItemIndex = newArray.findIndex(
       (obj) => obj.title === cartItem.title && obj.weight === cartItem.weight
@@ -377,6 +378,7 @@ export const TotalWeightFromProduct = ({
                               <FormLabel>Окремо?</FormLabel>
                               <Checkbox
                                 isDisabled={!selectedProduct}
+                                isChecked={selectedProduct?.isDivided}
                                 onChange={(e) =>
                                   onHandleChangeIsDivided(e.target.checked, selectedProduct!)
                                 }
