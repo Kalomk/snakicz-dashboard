@@ -69,14 +69,21 @@ const AnaliticsPage = async () => {
     ],
   };
   return (
-    <Flex mt={50} justifyContent={'space-around'} alignItems={'center'}>
+    <Flex
+      mt={50}
+      justifyContent={'space-around'}
+      flexDirection={['column', 'column', 'row', 'row']}
+      alignItems={'center'}
+    >
       <Box>
         <Box>
           <ul>
             {ordersComeFrom.map((item) => (
               <li>
                 <HStack>
-                  <Text>{item.orderComeFrom}</Text>
+                  <Text fontSize={'larger'} fontWeight={600}>
+                    {item.orderComeFrom}
+                  </Text>
                   <Text>{item._count}</Text>
                 </HStack>
               </li>
@@ -88,7 +95,9 @@ const AnaliticsPage = async () => {
             {products.map((item) => (
               <li>
                 <HStack>
-                  <Text>{item.title}</Text>
+                  <Text fontSize={'larger'} fontWeight={600}>
+                    {item.title}
+                  </Text>
                   <Text>{item.totalBuyCount}</Text>
                 </HStack>
               </li>
