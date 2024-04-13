@@ -76,6 +76,7 @@ const performOperations = async (
       // You need to provide orderNumber along with uniqueId for actualizeInfo
       if (email !== undefined) {
         Orders.sendConfirmationCode({ email, orderNumber, postNumber, postService });
+        break;
       }
       sendOrderConfirmation({ uniqueId, orderNumber, postNumber, postService });
       break;
