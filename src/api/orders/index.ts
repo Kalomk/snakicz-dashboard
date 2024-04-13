@@ -31,6 +31,29 @@ const getOrdersByDateRange = async (startDate: string, endDate: string): Promise
   }
 };
 
+const sendConfirmationCode = async ({
+  email,
+  orderNumber,
+  postService,
+  postNumber,
+}: {
+  email: string;
+  orderNumber: string;
+  postService: string;
+  postNumber: string;
+}) => {
+  try {
+    await axios.post(`mailer/sendConfirmationCode`, {
+      email,
+      orderNumber,
+      postService,
+      postNumber,
+    });
+  } catch (error) {
+    console.error('Error sending order confirmation:', error);
+  }
+};
+
 const deleteOrder = async (orderNumber: string) => {
   return await axios.post(`/orders/orderDelete/`, { orderNumber });
 };
@@ -61,4 +84,5 @@ export const Orders = {
   createOrder,
   getOrdersByDateRange,
   getOrderCountsByType,
+  sendConfirmationCode,
 };

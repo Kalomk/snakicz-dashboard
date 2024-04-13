@@ -53,6 +53,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
     addressPack,
     freeDelivery,
     uniqueId,
+    email,
   } = data;
   const orderItemsParsed =
     typeof orderItems === 'string'
@@ -95,7 +96,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
     onOpen: onOpenModalDelete,
   } = useDisclosure();
 
-  const operationLabels = {
+  const operationLabelsBot = {
     isConfirmationOrderSended: (status: boolean) =>
       status ? 'Підтвержено' : 'Підтвердити замовлення',
     isConfirmationPaymentSended: (status: boolean) =>
@@ -103,6 +104,12 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
     isPacNumberSended: (status: boolean) =>
       status ? 'Номер посилки надіслано' : 'Надіслати номер посилки',
     isActualize: (status: boolean) => (status ? 'Актуалізовано' : 'Актуалізувати замовлення'),
+  };
+  const operationLabelsOther = {
+    isConfirmationPaymentSended: (status: boolean) =>
+      status ? 'Відмітити як оплачений' : 'Відмічено як оплачений',
+    isPacNumberSended: (status: boolean) =>
+      status ? 'Надіслати код підтвердження на пошту' : 'Код підтвердження на пошту вислано',
   };
 
   const operationStatus = {
@@ -133,7 +140,9 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
     uniqueId: string,
     orderNumber: string,
     postNumber?: string,
-    postService?: string
+    postService?: string,
+    orderType?: 'bot' | 'other',
+    email?: string
   ) => {
     try {
       // Call the performOperations function with the provided operations
@@ -142,7 +151,9 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
         uniqueId,
         orderNumber,
         postNumber!,
-        postService!
+        postService!,
+        orderType,
+        email
       );
 
       toast.promise(statusPromiseObject, {
@@ -239,13 +250,15 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
   const renderInputModal = () => {
     return (
       <ModalComponent onClose={onCloseModalSendConfirmation} isOpen={isModalOpenSendConfirmation}>
-        <Flex flexDirection={'column'} alignContent={'center'} justifyContent={'center'}>
+        <Flex p={4} flexDirection={'column'} alignContent={'center'} justifyContent={'center'}>
           <Input
+            mt={10}
             value={postData.postService}
             onChange={(e) => setPostData((prev) => ({ ...prev, postService: e.target.value }))}
             placeholder="Сервіс відправки"
           />
           <Input
+            mt={10}
             value={postData.postNumber}
             onChange={(e) => setPostData((prev) => ({ ...prev, postNumber: e.target.value }))}
             placeholder="Номер посилки"
@@ -257,7 +270,9 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                 uniqueId!,
                 orderNumber,
                 postData.postNumber,
-                postData.postService
+                postData.postService,
+                'bot',
+                email
               )
             }
           >
@@ -442,8 +457,8 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                 </Button>
               </Flex>
               <VStack marginTop={4}>
-                {Object.entries(operationLabels).map(([status, text]) => {
-                  const s = `op_${status}` as Concat<['op_', keyof typeof operationLabels]>;
+                {Object.entries(operationLabelsBot).map(([status, text]) => {
+                  const s = `op_${status}` as Concat<['op_', keyof typeof operationLabelsBot]>;
                   const stats =
                     orderStatus && orderStatus[s] !== undefined ? orderStatus[s] : data[s];
                   return (
@@ -455,7 +470,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                           ? onOpenModalSendConfirmation
                           : () =>
                               handleButtonClick(
-                                status as keyof typeof operationLabels,
+                                status as keyof typeof operationLabelsBot,
                                 uniqueId!,
                                 orderNumber
                               )
@@ -476,12 +491,32 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                 justifyContent={'center'}
                 gap={5}
               >
-                <Button colorScheme={'green'} variant={staticPaymentStatus ? 'solid' : 'outline'}>
-                  Відмітити як оплачений
-                </Button>
-                <Button colorScheme={'green'} variant={staticEmailSendStatus ? 'solid' : 'outline'}>
-                  <Text whiteSpace={'normal'}> Надіслати підтвердження на пошту</Text>
-                </Button>
+                {Object.entries(operationLabelsOther).map(([status, text]) => {
+                  const s = `op_${status}` as Concat<['op_', keyof typeof operationLabelsOther]>;
+                  const stats =
+                    orderStatus && orderStatus[s] !== undefined ? orderStatus[s] : data[s];
+                  return (
+                    <Button
+                      colorScheme={'green'}
+                      variant={stats ? 'solid' : 'outline'}
+                      onClick={
+                        status === 'isPacNumberSended'
+                          ? onOpenModalSendConfirmation
+                          : () =>
+                              handleButtonClick(
+                                status as keyof typeof operationLabelsBot,
+                                uniqueId!,
+                                orderNumber,
+                                undefined,
+                                undefined,
+                                'other'
+                              )
+                      }
+                    >
+                      {text(stats!)}
+                    </Button>
+                  );
+                })}
               </Flex>
             </Box>
           )}

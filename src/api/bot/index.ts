@@ -24,9 +24,13 @@ const confirmOrder = async (uniqueId: string, orderNumber: string) => {
   }
 };
 
-const paymentConfirm = async (uniqueId: string) => {
+const paymentConfirm = async (
+  uniqueId: string,
+  orderNumber: string,
+  orderType: 'bot' | 'other' = 'bot'
+) => {
   try {
-    await axios.post(`/bot/paymentConfirm`, { uniqueId });
+    await axios.post(`/bot/paymentConfirm`, { uniqueId, orderNumber, orderType });
   } catch (error) {
     console.error('Error confirming payment:', error);
   }
@@ -57,17 +61,22 @@ const performOperations = async (
   uniqueId: string,
   orderNumber: string,
   postNumber: string,
-  postService: string
+  postService: string,
+  orderType?: 'bot' | 'other',
+  email?: string
 ) => {
   switch (op1) {
     case 'isConfirmationOrderSended':
       await confirmOrder(uniqueId, orderNumber);
       break;
     case 'isConfirmationPaymentSended':
-      await paymentConfirm(uniqueId);
+      await paymentConfirm(uniqueId, orderNumber, orderType);
       break;
     case 'isPacNumberSended':
       // You need to provide orderNumber along with uniqueId for actualizeInfo
+      if (email !== undefined) {
+        Orders.sendConfirmationCode({ email, orderNumber, postNumber, postService });
+      }
       sendOrderConfirmation({ uniqueId, orderNumber, postNumber, postService });
       break;
     case 'isActualize':
