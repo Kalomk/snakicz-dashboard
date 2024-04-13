@@ -31,6 +31,7 @@ const getOrdersByDateRange = async (startDate: string, endDate: string): Promise
   }
 };
 
+//mailer code
 const sendConfirmationCode = async ({
   email,
   orderNumber,
