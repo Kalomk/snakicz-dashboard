@@ -348,7 +348,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
   };
 
   return (
-    <Box whiteSpace={'normal'} p={4} borderWidth="1px" borderRadius="lg">
+    <Box p={4} borderWidth="1px" borderRadius="lg">
       {' '}
       <Flex
         flexDirection={['column', 'column', 'column', 'column', 'row']}
@@ -517,7 +517,6 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
           ) : (
             <Box mt={20}>
               <Flex
-                whiteSpace={'normal'}
                 mt={2}
                 flexDirection={'column'}
                 alignContent={'center'}
@@ -530,6 +529,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                     orderStatus && orderStatus[s] !== undefined ? orderStatus[s] : data[s];
                   return (
                     <Button
+                      whiteSpace={'normal'}
                       colorScheme={'green'}
                       variant={stats ? 'solid' : 'outline'}
                       onClick={
