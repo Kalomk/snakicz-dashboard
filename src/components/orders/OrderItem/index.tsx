@@ -53,7 +53,6 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
     addressPack,
     freeDelivery,
     uniqueId,
-    email,
   } = data;
   const orderItemsParsed =
     typeof orderItems === 'string'
@@ -113,9 +112,9 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
   };
   const operationLabelsOther = {
     isConfirmationPaymentSended: (status: boolean) =>
-      status ? 'Відмітити як оплачений' : 'Відмічено як оплачений',
+      status ? 'Відмічено як оплачений' : 'Відмітити як оплачений',
     isPacNumberSended: (status: boolean) =>
-      status ? 'Надіслати код підтвердження на пошту' : 'Код підтвердження на пошту вислано',
+      status ? 'Код підтвердження на пошту вислано' : 'Надіслати код підтвердження на пошту',
   };
 
   const operationStatus = {
@@ -348,16 +347,6 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
     );
   };
 
-  //static stats
-  const staticPaymentStatus =
-    orderStatus && orderStatus.op_isConfirmationPaymentSended !== undefined
-      ? orderStatus.op_isConfirmationPaymentSended
-      : data.op_isConfirmationPaymentSended;
-  const staticEmailSendStatus =
-    orderStatus && orderStatus.op_isPacNumberSended !== undefined
-      ? orderStatus.op_isPacNumberSended
-      : data.op_isPacNumberSended;
-
   return (
     <Box whiteSpace={'normal'} p={4} borderWidth="1px" borderRadius="lg">
       {' '}
@@ -528,6 +517,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
           ) : (
             <Box mt={20}>
               <Flex
+                whiteSpace={'normal'}
                 mt={2}
                 flexDirection={'column'}
                 alignContent={'center'}

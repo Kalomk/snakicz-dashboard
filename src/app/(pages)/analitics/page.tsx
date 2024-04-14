@@ -3,6 +3,8 @@ import { Products } from '@/api/products';
 import ChartComponent from '@/components/chart';
 import { Box, Flex, HStack, Text } from '@chakra-ui/react';
 
+export const dynamic = 'force-dynamic';
+
 const AnaliticsPage = async () => {
   const ordersComeFrom = await Orders.getOrderCountsByType();
   const products = await Products.getAllProducts();
