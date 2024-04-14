@@ -8,9 +8,9 @@ export const filterSchemaUsers: FilterSchemaType<UserDataTypes>[] = [
 
 export const filterSchemaOrders: FilterSchemaType<OrderType>[] = [
   { name: 'Всі', filterFunc: (data) => !!data },
-  { name: 'Оплачені', filterFunc: (data) => data.paymentConfirmPicUrl !== '' },
+  { name: 'Оплачені', filterFunc: (data) => data.op_isConfirmationPaymentSended! },
   { name: 'З кицею', filterFunc: (data) => data.isCatExist },
-  { name: 'Не оплачені', filterFunc: (data) => data.paymentConfirmPicUrl == '' },
+  { name: 'Не оплачені', filterFunc: (data) => !data.op_isConfirmationPaymentSended },
   { name: 'З Бота', filterFunc: (data) => data.orderComeFrom === 'telegram_bot' },
 ];
 
