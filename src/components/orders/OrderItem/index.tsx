@@ -86,6 +86,12 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
   } = useDisclosure();
 
   const {
+    isOpen: isModalOpenSendConfirmationMail,
+    onClose: onCloseModalSendConfirmationMail,
+    onOpen: onOpenModalSendConfirmationMail,
+  } = useDisclosure();
+
+  const {
     isOpen: isModalOpenAudio,
     onClose: onCloseModalAudio,
     onOpen: onOpenModalAudio,
@@ -270,9 +276,46 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                 uniqueId!,
                 orderNumber,
                 postData.postNumber,
+                postData.postService
+              )
+            }
+          >
+            Відправити
+          </Button>
+        </Flex>
+      </ModalComponent>
+    );
+  };
+
+  const renderInputModalMail = () => {
+    return (
+      <ModalComponent
+        onClose={onCloseModalSendConfirmationMail}
+        isOpen={isModalOpenSendConfirmationMail}
+      >
+        <Flex p={4} flexDirection={'column'} alignContent={'center'} justifyContent={'center'}>
+          <Input
+            mt={10}
+            value={postData.postService}
+            onChange={(e) => setPostData((prev) => ({ ...prev, postService: e.target.value }))}
+            placeholder="Сервіс відправки"
+          />
+          <Input
+            mt={10}
+            value={postData.postNumber}
+            onChange={(e) => setPostData((prev) => ({ ...prev, postNumber: e.target.value }))}
+            placeholder="Номер посилки"
+          />
+          <Button
+            onClick={() =>
+              handleButtonClick(
+                'isPacNumberSended',
+                uniqueId!,
+                orderNumber,
+                postData.postNumber,
                 postData.postService,
-                'bot',
-                email
+                'other',
+                data.email
               )
             }
           >
@@ -501,7 +544,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                       variant={stats ? 'solid' : 'outline'}
                       onClick={
                         status === 'isPacNumberSended'
-                          ? onOpenModalSendConfirmation
+                          ? onOpenModalSendConfirmationMail
                           : () =>
                               handleButtonClick(
                                 status as keyof typeof operationLabelsBot,
@@ -527,6 +570,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
       {renderAudioModal()}
       {renderInputModal()}
       {renderDeleteModal()}
+      {renderInputModalMail()}
     </Box>
   );
 };
