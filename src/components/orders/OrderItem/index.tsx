@@ -348,7 +348,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
   };
 
   return (
-    <Box p={2} borderWidth="1px" borderRadius="lg">
+    <Box p={1} borderWidth="0.4px" borderRadius="lg">
       {' '}
       <Flex
         flexDirection={['column', 'column', 'column', 'column', 'row']}
@@ -530,7 +530,6 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                   return (
                     <Button
                       colorScheme={'green'}
-                      whiteSpace={'normal'}
                       variant={stats ? 'solid' : 'outline'}
                       onClick={
                         status === 'isPacNumberSended'

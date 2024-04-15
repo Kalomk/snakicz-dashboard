@@ -129,13 +129,13 @@ function FilteredData({
               display={['flex', 'flex', 'flex', 'flex', 'none', 'none']}
               justifyContent={'space-around'}
               mt={2}
-              p={3}
+              p={1}
             >
-              <CalendarMobile size={22} onClick={onOpen} />
+              <CalendarMobile size={20} onClick={onOpen} />
               <ModalComponent isOpen={isOpen} onClose={onClose}>
                 {renderDateRange()}
               </ModalComponent>
-              <SerachMobile size={22} />
+              <SerachMobile size={20} />
             </Box>
           </>
         ) : null}
@@ -163,7 +163,6 @@ function FilteredData({
                       mt={8}
                       mx="auto"
                       overflowX="auto" // Use overflowX to allow horizontal overflow
-                      whiteSpace="nowrap" // Prevent wrapping of grid items
                     >
                       {filteredArray.map((item) => {
                         if (isProduct(item)) {
