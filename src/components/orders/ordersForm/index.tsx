@@ -41,58 +41,60 @@ const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
     initialValues: FormikOrders.initialValues,
     validationSchema: FormikOrders.validationSchema(selectedAddress, includeCatPic),
     onSubmit: async (values, { resetForm }) => {
-      const { userNameAndLastName, shipPrice, totalPrice, orderItems, ...rest } = values;
+      const { userNameAndLastName, shipPrice, orderItems, ...rest } = values;
       const [userName, userLastName] = userNameAndLastName.split(' ');
-      const changeQuantityOfProductPromise = Products.minusQuantityOfProducts(
-        values.orderItems as unknown as CartItem[]
-      );
-      const data: OrderType = {
-        ...rest,
-        userName,
-        userLastName,
-        orderItems: JSON.stringify(orderItems),
-        totalPrice: shipPrice + values.price,
-        isCatExist: includeCatPic,
-      };
       const registrationToast = toast({
         title: 'Відправляється повідомлення',
         description: 'Відправляється...',
         position: 'top-right',
       });
-      setIsLoading(true);
 
-      Products.minusQuantityOfProducts(values.orderItems as unknown as CartItem[])
-        .then(async () => {
-          const userDataUniqueId = (
-            await Users.createOrFindExistUser(values.userNickname, values.phoneNumber)
-          ).uniqueId;
-          Orders.createOrder(userDataUniqueId, data);
-        })
-        .then(async () => {
-          if ((await changeQuantityOfProductPromise).productsWithZeroWeight === undefined) {
-            toast.close(registrationToast);
-            toast({
-              title: 'Замовлення оформлено успішно',
-              description: 'Замовлення оформлено успішно',
-              position: 'top-right',
-              status: 'success',
-            });
-            setIsLoading(false);
-            resetForm();
-            window.location.reload();
-          }
-        })
-        .catch(async (error) => {
-          toast.close(registrationToast);
-          toast({
-            title: 'Замовлення не прийнято',
-            description: `${error.response.data?.join(',')}`,
-            position: 'top-right',
-            status: 'error',
-          });
-          setIsLoading(false);
-          console.error('Error sending data:', error);
+      try {
+        setIsLoading(true);
+
+        // Minus quantity of products
+        await Products.minusQuantityOfProducts(orderItems as unknown as CartItem[]);
+
+        // Create or find user
+        const userDataUniqueId = (
+          await Users.createOrFindExistUser(values.userNickname, values.phoneNumber)
+        ).uniqueId;
+
+        // Create order
+        const data: OrderType = {
+          ...rest,
+          userName,
+          userLastName,
+          orderItems: JSON.stringify(orderItems),
+          totalPrice: shipPrice + values.price,
+          isCatExist: includeCatPic,
+        };
+        await Orders.createOrder(userDataUniqueId, data);
+
+        // Close registration toast and show success toast
+        toast.close(registrationToast);
+        toast({
+          title: 'Замовлення оформлено успішно',
+          description: 'Замовлення оформлено успішно',
+          position: 'top-right',
+          status: 'success',
         });
+
+        // Reset form and reload page
+        resetForm();
+        window.location.reload();
+      } catch (error) {
+        toast.close(registrationToast);
+        toast({
+          title: 'Замовлення не прийнято',
+          description: `${(error as any).response.data?.join(',')}`,
+          position: 'top-right',
+          status: 'error',
+        });
+        console.error('Error sending data:', error);
+      } finally {
+        setIsLoading(false);
+      }
     },
   });
 
