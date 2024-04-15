@@ -339,7 +339,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
             mt={10}
             value={postNumberSend}
             onChange={(e) => setPostNumberSend(e.target.value)}
-            placeholder="Номер посилки"
+            placeholder="Номер посилки для відправки"
           />
           <Button onClick={() => Orders.addASendNumberToOrder(orderNumber, postNumberSend)}>
             Відправити
@@ -421,9 +421,18 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
           <Text>{`Місто: ${userCity}`}</Text>
           <Text>{`Індекс міста: ${userIndexCity}`}</Text>
           <Text>{`Загальна вага: ${totalWeight}г`}</Text>
-          {data.postSendNumber && (
+          {data.postSendNumber !== '' ? (
             <Text>
               {`Номер відправки:`} <span color="red">{data.postSendNumber}</span>
+            </Text>
+          ) : (
+            <Text
+              color={'yellow'}
+              fontSize={21}
+              cursor={'pointer'}
+              onClick={onOpenModalSendPostNumber}
+            >
+              Додати номер відправки
             </Text>
           )}
           <Divider my={2} />
@@ -589,6 +598,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
       {renderInputModal()}
       {renderDeleteModal()}
       {renderInputModalMail()}
+      {renderInputModalPostNumber()}
     </Box>
   );
 };
