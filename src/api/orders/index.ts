@@ -31,6 +31,11 @@ const getOrdersByDateRange = async (startDate: string, endDate: string): Promise
   }
 };
 
+const addASendNumberToOrder = async (orderNumber: string, postSendNumber: string) => {
+  return (await axios.post('/orders/addASendNumberToOrder', { orderNumber, postSendNumber }))
+    .data as OrderType[];
+};
+
 //mailer code
 const sendConfirmationCode = async ({
   email,
@@ -83,6 +88,7 @@ export const Orders = {
   updateUserOrderStatusAxios,
   deleteOrder,
   createOrder,
+  addASendNumberToOrder,
   getOrdersByDateRange,
   getOrderCountsByType,
   sendConfirmationCode,

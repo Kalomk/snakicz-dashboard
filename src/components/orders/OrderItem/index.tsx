@@ -63,6 +63,8 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
   const { isOpen, onToggle } = useDisclosure();
   const [orderStatus, setOrderStatus] = useState<OrderType>();
   const [postData, setPostData] = useState({ postService: '', postNumber: '' });
+  const [postNumberSend, setPostNumberSend] = useState('');
+
   const ref = useRef<any>();
   const toast = useToast();
 
@@ -88,6 +90,11 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
     isOpen: isModalOpenSendConfirmationMail,
     onClose: onCloseModalSendConfirmationMail,
     onOpen: onOpenModalSendConfirmationMail,
+  } = useDisclosure();
+  const {
+    isOpen: isModalOpenSendPostNumber,
+    onClose: onCloseModalSendPostNumber,
+    onOpen: onOpenModalSendPostNumber,
   } = useDisclosure();
 
   const {
@@ -324,6 +331,23 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
       </ModalComponent>
     );
   };
+  const renderInputModalPostNumber = () => {
+    return (
+      <ModalComponent onClose={onCloseModalSendPostNumber} isOpen={isModalOpenSendPostNumber}>
+        <Flex flexDirection={'column'} alignContent={'center'} justifyContent={'center'}>
+          <Input
+            mt={10}
+            value={postNumberSend}
+            onChange={(e) => setPostNumberSend(e.target.value)}
+            placeholder="Номер посилки"
+          />
+          <Button onClick={() => Orders.addASendNumberToOrder(orderNumber, postNumberSend)}>
+            Відправити
+          </Button>
+        </Flex>
+      </ModalComponent>
+    );
+  };
 
   const renderDeleteModal = () => {
     return (
@@ -397,6 +421,11 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
           <Text>{`Місто: ${userCity}`}</Text>
           <Text>{`Індекс міста: ${userIndexCity}`}</Text>
           <Text>{`Загальна вага: ${totalWeight}г`}</Text>
+          {data.postSendNumber && (
+            <Text>
+              {`Номер відправки:`} <span color="red">{data.postSendNumber}</span>
+            </Text>
+          )}
           <Divider my={2} />
           <Button onClick={onToggle}>Список</Button>
           <Collapse in={isOpen} transition={{ exit: { delay: 1 }, enter: { duration: 0.5 } }}>
