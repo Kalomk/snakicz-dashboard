@@ -442,11 +442,12 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
           <Text>{`Загальна вага: ${totalWeight}г`}</Text>
           {data.postSendNumber !== '' ? (
             <Text>
-              {`Номер відправки:`} <span color="red">{data.postSendNumber}</span>
+              Номер відправки:{' '}
+              <span style={{ color: 'red', fontWeight: 800 }}>{data.postSendNumber}</span>
             </Text>
           ) : (
             <Text
-              color={'yellow'}
+              color={'orange'}
               fontSize={21}
               cursor={'pointer'}
               onClick={onOpenModalSendPostNumber}
@@ -472,8 +473,11 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                         {item.isDivided ? '(окремо)' : ''}
                       </Text>
                     </Text>
-                    <Text>{`${item.weight}г | ${item.price} ${item.activePrice}`}</Text>
-                    <Text>{`Кількість: ${item.count}`}</Text>
+                    <Text fontWeight={900} color={'Highlight'}>{`${item.weight}г`}</Text>
+                    <Text
+                      fontWeight={800}
+                      color={'ActiveCaption'}
+                    >{`Кількість: ${item.count}`}</Text>
                   </Box>
                 </ListItem>
               ))}
