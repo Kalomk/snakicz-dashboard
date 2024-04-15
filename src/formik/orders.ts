@@ -42,6 +42,11 @@ const validationSchema = (selectedAddress: 'pack' | 'user' | 'bielsko', includeC
   Yup.object().shape({
     userNameAndLastName: Yup.string()
       .matches(/^[a-zA-ZęĘóÓąĄśŚłŁżŻźŹćĆńŃ\s]*$/, "Ім'я повинно містити лише латинські літери")
+      .test('two-words', 'Має містити два слова', (value) => {
+        if (!value) return false; // If value is empty, return false
+        const words = value.split(' ');
+        return words.length === 2; // Check if there are exactly two words
+      })
       .required("Ім'я обов'язкове поле"),
     phoneNumber: Yup.string()
       .matches(/^[0-9]*$/, 'Номер телефону повинен містити лише цифри')

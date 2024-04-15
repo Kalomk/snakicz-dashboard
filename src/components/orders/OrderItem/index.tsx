@@ -271,20 +271,27 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
           />
           <Input
             mt={10}
+            mb={5}
             value={postData.postNumber}
             onChange={(e) => setPostData((prev) => ({ ...prev, postNumber: e.target.value }))}
             placeholder="Номер посилки"
           />
           <Button
-            onClick={() =>
-              handleButtonClick(
-                'isPacNumberSended',
-                uniqueId!,
-                orderNumber,
-                postData.postNumber,
-                postData.postService
-              )
-            }
+            onClick={() => {
+              try {
+                handleButtonClick(
+                  'isPacNumberSended',
+                  uniqueId!,
+                  orderNumber,
+                  postData.postNumber,
+                  postData.postService
+                );
+              } catch (e) {
+                console.log(e);
+              } finally {
+                onCloseModalSendConfirmation();
+              }
+            }}
           >
             Відправити
           </Button>
@@ -337,11 +344,23 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
         <Flex flexDirection={'column'} alignContent={'center'} justifyContent={'center'}>
           <Input
             mt={10}
+            mb={5}
             value={postNumberSend}
             onChange={(e) => setPostNumberSend(e.target.value)}
             placeholder="Номер посилки для відправки"
           />
-          <Button onClick={() => Orders.addASendNumberToOrder(orderNumber, postNumberSend)}>
+          <Button
+            mb={5}
+            onClick={() => {
+              try {
+                Orders.addASendNumberToOrder(orderNumber, postNumberSend);
+              } catch (e) {
+                console.log(e);
+              } finally {
+                onCloseModalSendPostNumber();
+              }
+            }}
+          >
             Відправити
           </Button>
         </Flex>
