@@ -292,7 +292,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
         onClose={onCloseModalSendConfirmationMail}
         isOpen={isModalOpenSendConfirmationMail}
       >
-        <Flex p={4} flexDirection={'column'} alignContent={'center'} justifyContent={'center'}>
+        <Flex flexDirection={'column'} alignContent={'center'} justifyContent={'center'}>
           <Input
             mt={10}
             value={postData.postService}
@@ -348,7 +348,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
   };
 
   return (
-    <Box p={4} borderWidth="1px" borderRadius="lg">
+    <Box p={2} borderWidth="1px" borderRadius="lg">
       {' '}
       <Flex
         flexDirection={['column', 'column', 'column', 'column', 'row']}
@@ -529,8 +529,8 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                     orderStatus && orderStatus[s] !== undefined ? orderStatus[s] : data[s];
                   return (
                     <Button
-                      whiteSpace={'normal'}
                       colorScheme={'green'}
+                      whiteSpace={'normal'}
                       variant={stats ? 'solid' : 'outline'}
                       onClick={
                         status === 'isPacNumberSended'
