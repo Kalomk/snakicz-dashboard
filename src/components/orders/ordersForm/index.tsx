@@ -24,6 +24,7 @@ import { calculateShip } from '@/utils/calcShipPrice';
 import { Users } from '@/api/users';
 import { Orders } from '@/api/orders';
 import { Products } from '@/api/products';
+import { uploadProductFileImg } from '@/utils/uploadTotheMediaServer';
 
 const TotalWeightFromProductMemoized = memo(TotalWeightFromProduct);
 
@@ -41,7 +42,11 @@ const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
     initialValues: FormikOrders.initialValues,
     validationSchema: FormikOrders.validationSchema(selectedAddress, includeCatPic),
     onSubmit: async (values, { resetForm }) => {
-      const { userNameAndLastName, shipPrice, orderItems, ...rest } = values;
+      const { userNameAndLastName, shipPrice, orderItems, catExistConfirmPicUrl, ...rest } = values;
+      const imgUrl = catExistConfirmPicUrl
+        ? (await uploadProductFileImg(catExistConfirmPicUrl)).imgUrl
+        : '';
+
       const [userName, userLastName] = userNameAndLastName.split(' ');
       const registrationToast = toast({
         title: 'Відправляється повідомлення',
@@ -64,6 +69,7 @@ const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
         const data: OrderType = {
           ...rest,
           userName,
+          catExistConfirmPicUrl: imgUrl,
           userLastName,
           orderItems: JSON.stringify(orderItems),
           totalPrice: shipPrice + values.price,

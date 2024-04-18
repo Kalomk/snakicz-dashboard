@@ -3,6 +3,8 @@ import Flippy, { FrontSide, BackSide } from 'react-flippy';
 import { useRef, useState } from 'react';
 import catPicThumbNail from '/public/cat_thumbnail.webp';
 import paymentPicThumbNail from '/public/payment_thumbnail.png';
+import { FaRegSquareCheck } from 'react-icons/fa6';
+import { MdCancelPresentation } from 'react-icons/md';
 
 import {
   Box,
@@ -320,17 +322,23 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
             placeholder="Номер посилки"
           />
           <Button
-            onClick={() =>
-              handleButtonClick(
-                'isPacNumberSended',
-                uniqueId!,
-                orderNumber,
-                postData.postNumber,
-                postData.postService,
-                'other',
-                data.email
-              )
-            }
+            onClick={() => {
+              try {
+                handleButtonClick(
+                  'isPacNumberSended',
+                  uniqueId!,
+                  orderNumber,
+                  postData.postNumber,
+                  postData.postService,
+                  'other',
+                  data.email
+                );
+              } catch (e) {
+                console.log(e);
+              } finally {
+                onCloseModalSendConfirmationMail();
+              }
+            }}
           >
             Відправити
           </Button>
@@ -358,6 +366,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                 console.log(e);
               } finally {
                 onCloseModalSendPostNumber();
+                window.location.reload();
               }
             }}
           >
@@ -395,13 +404,24 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
       {' '}
       <Flex
         flexDirection={['column', 'column', 'column', 'column', 'row']}
-        justify="space-between"
-        align="center"
+        justifyContent={'space-between'}
+        gap={3}
+        alignItems={'center'}
       >
-        <Text fontWeight="bold">{`Замовлення #${orderNumber}`}</Text>
-        <Badge colorScheme={op_isConfirmationPaymentSended ? 'green' : 'red'}>
-          {op_isConfirmationPaymentSended ? 'Оплачено' : 'Не оплачено'}
-        </Badge>
+        <Box>
+          <Text fontWeight="bold">{`Замовлення #${orderNumber}`}</Text>
+        </Box>
+        <Flex flexDirection={'column'} gap={3}>
+          <Badge colorScheme={op_isConfirmationPaymentSended ? 'green' : 'red'}>
+            {op_isConfirmationPaymentSended ? 'Оплачено' : 'Не оплачено'}
+          </Badge>
+          <Badge colorScheme={catExistConfirmPicUrl !== '' ? 'purple' : 'orange'}>
+            {catExistConfirmPicUrl ? 'Є котик 🐱' : 'Нема котика'}
+          </Badge>
+          <Badge colorScheme={data.postSendNumber !== '' ? 'green' : 'red'}>
+            {data.postSendNumber !== '' ? 'Вислано' : 'Не вислано'}
+          </Badge>
+        </Flex>
       </Flex>
       <Divider my={2} />
       <Flippy
@@ -554,7 +574,28 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                   const s = `op_${status}` as Concat<['op_', keyof typeof operationLabelsBot]>;
                   const stats =
                     orderStatus && orderStatus[s] !== undefined ? orderStatus[s] : data[s];
-                  return (
+                  return s === 'op_isActualize' ? (
+                    <Flex gap={3} justifyContent={'center'} alignContent={'center'}>
+                      <Button
+                        colorScheme={'green'}
+                        variant={stats ? 'solid' : 'outline'}
+                        onClick={() =>
+                          handleButtonClick(
+                            status as keyof typeof operationLabelsBot,
+                            uniqueId!,
+                            orderNumber
+                          )
+                        }
+                      >
+                        {text(stats!)}
+                      </Button>
+                      {data.orderStatus === 'accepted' || !data.orderStatus ? (
+                        <FaRegSquareCheck color={data.orderStatus ? 'green' : 'gray'} />
+                      ) : (
+                        <MdCancelPresentation color="red" />
+                      )}
+                    </Flex>
+                  ) : (
                     <Button
                       colorScheme={'green'}
                       variant={stats ? 'solid' : 'outline'}
@@ -584,6 +625,22 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                 justifyContent={'center'}
                 gap={5}
               >
+                <Box>
+                  <Image
+                    onClick={catExistConfirmPicUrl !== '' ? onOpenModalCatPic : undefined}
+                    width={'80px'}
+                    height={'80px'}
+                    src={
+                      catExistConfirmPicUrl !== '' ? catExistConfirmPicUrl! : catPicThumbNail.src
+                    }
+                    alt="cat"
+                  />
+
+                  <Text color={catExistConfirmPicUrl !== '' ? 'green' : 'red'}>
+                    {' '}
+                    {catExistConfirmPicUrl !== '' ? 'є фото' : 'нема фото'}
+                  </Text>
+                </Box>
                 {Object.entries(operationLabelsOther).map(([status, text]) => {
                   const s = `op_${status}` as Concat<['op_', keyof typeof operationLabelsOther]>;
                   const stats =
