@@ -590,9 +590,9 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                         {text(stats!)}
                       </Button>
                       {data.orderStatus === 'accepted' || !data.orderStatus ? (
-                        <FaRegSquareCheck color={data.orderStatus ? 'green' : 'gray'} />
+                        <FaRegSquareCheck size={40} color={data.orderStatus ? 'green' : 'gray'} />
                       ) : (
-                        <MdCancelPresentation color="red" />
+                        <MdCancelPresentation size={40} color="red" />
                       )}
                     </Flex>
                   ) : (
@@ -617,7 +617,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
               </VStack>
             </Box>
           ) : (
-            <Box mt={20}>
+            <Box mt={10}>
               <Flex
                 mt={2}
                 flexDirection={'column'}
@@ -625,48 +625,48 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
                 justifyContent={'center'}
                 gap={5}
               >
-                <Box>
-                  <Image
-                    onClick={catExistConfirmPicUrl !== '' ? onOpenModalCatPic : undefined}
-                    width={'80px'}
-                    height={'80px'}
-                    src={
-                      catExistConfirmPicUrl !== '' ? catExistConfirmPicUrl! : catPicThumbNail.src
-                    }
-                    alt="cat"
-                  />
-
-                  <Text color={catExistConfirmPicUrl !== '' ? 'green' : 'red'}>
-                    {' '}
-                    {catExistConfirmPicUrl !== '' ? 'є фото' : 'нема фото'}
-                  </Text>
-                </Box>
-                {Object.entries(operationLabelsOther).map(([status, text]) => {
-                  const s = `op_${status}` as Concat<['op_', keyof typeof operationLabelsOther]>;
-                  const stats =
-                    orderStatus && orderStatus[s] !== undefined ? orderStatus[s] : data[s];
-                  return (
-                    <Button
-                      colorScheme={'green'}
-                      variant={stats ? 'solid' : 'outline'}
-                      onClick={
-                        status === 'isPacNumberSended'
-                          ? onOpenModalSendConfirmationMail
-                          : () =>
-                              handleButtonClick(
-                                status as keyof typeof operationLabelsBot,
-                                uniqueId!,
-                                orderNumber,
-                                undefined,
-                                undefined,
-                                'other'
-                              )
+                {catExistConfirmPicUrl ? (
+                  <Flex justifyContent={'center'} alignContent={'center'}>
+                    <Image
+                      onClick={catExistConfirmPicUrl !== '' ? onOpenModalCatPic : undefined}
+                      width={'80px'}
+                      height={'80px'}
+                      src={
+                        catExistConfirmPicUrl !== '' ? catExistConfirmPicUrl! : catPicThumbNail.src
                       }
-                    >
-                      {text(stats!)}
-                    </Button>
-                  );
-                })}
+                      alt="cat"
+                    />
+                  </Flex>
+                ) : null}
+
+                <>
+                  {Object.entries(operationLabelsOther).map(([status, text]) => {
+                    const s = `op_${status}` as Concat<['op_', keyof typeof operationLabelsOther]>;
+                    const stats =
+                      orderStatus && orderStatus[s] !== undefined ? orderStatus[s] : data[s];
+                    return (
+                      <Button
+                        colorScheme={'green'}
+                        variant={stats ? 'solid' : 'outline'}
+                        onClick={
+                          status === 'isPacNumberSended'
+                            ? onOpenModalSendConfirmationMail
+                            : () =>
+                                handleButtonClick(
+                                  status as keyof typeof operationLabelsBot,
+                                  uniqueId!,
+                                  orderNumber,
+                                  undefined,
+                                  undefined,
+                                  'other'
+                                )
+                        }
+                      >
+                        {text(stats!)}
+                      </Button>
+                    );
+                  })}
+                </>
               </Flex>
             </Box>
           )}

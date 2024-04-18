@@ -230,7 +230,7 @@ const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
             {includeCatPic && (
               <FormControl>
                 <FileUploader
-                  name={'catPic'}
+                  name={'catExistConfirmPicUrl'}
                   type="file"
                   ref={fileRef}
                   setFieldValue={formik.setFieldValue}
