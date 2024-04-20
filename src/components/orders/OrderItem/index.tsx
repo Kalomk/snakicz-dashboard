@@ -390,7 +390,16 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
           <Button
             mt={6}
             colorScheme="red"
-            onClick={() => handleDeleteOrder(orderNumber, orderItemsParsed)}
+            onClick={() => {
+              try {
+                handleDeleteOrder(orderNumber, orderItemsParsed);
+              } catch (e) {
+                console.log(e);
+              } finally {
+                onCloseModalDelete();
+                window.location.reload();
+              }
+            }}
           >
             Так, видалити
           </Button>

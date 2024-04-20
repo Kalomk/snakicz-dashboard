@@ -1,4 +1,3 @@
-import { RequestCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import axios from '../../core/axios';
 import { UserDataTypes } from 'snakicz-types';
 
