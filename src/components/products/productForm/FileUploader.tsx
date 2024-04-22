@@ -2,7 +2,7 @@ import { Input } from '@chakra-ui/react';
 import classNames from 'classnames';
 import { ComponentProps, forwardRef, Ref } from 'react';
 
-interface HTMLInputEvent extends Event {
+export interface HTMLInputEvent extends Event {
   target: HTMLInputElement & EventTarget;
 }
 

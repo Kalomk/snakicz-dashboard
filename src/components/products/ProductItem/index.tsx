@@ -7,6 +7,8 @@ import { Products } from '@/api/products';
 import { SelectTitles } from './SelectTitles';
 import { calculatePriceInEuro } from '@/utils/calcEuro';
 import { CustomComponentPropsWidthProductType } from '../../../../mainTypes';
+import { uploadProductFileImg } from '@/utils/uploadTotheMediaServer';
+import { HTMLInputEvent } from '../productForm/FileUploader';
 
 // Type guard to check if the target element is a select element
 function isSelectElement(target: EventTarget): target is HTMLSelectElement {
@@ -92,7 +94,7 @@ const ProductItem: React.FC<CustomComponentPropsWidthProductType<ProductType>> =
 
   const checkIfSet = (category: number) => (category === 3 ? 'шт' : 'г');
 
-  const handleChange = (
+  const handleChange = async (
     e: ChangeEvent<HTMLSelectElement> | ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     index?: number
   ) => {
@@ -119,6 +121,13 @@ const ProductItem: React.FC<CustomComponentPropsWidthProductType<ProductType>> =
       } else if (name === 'totalWeightProduct') {
         setEditData((prev) => {
           return { ...prev, [name]: Number(value) };
+        });
+      } else if (name === 'img') {
+        const file = (e as unknown as HTMLInputEvent)!.target!.files![0];
+        const imgUrl = file ? (await uploadProductFileImg(file)).imgUrl : img;
+
+        setEditData((prev) => {
+          return { ...prev, [name]: imgUrl };
         });
       } else {
         setEditData((prev) => ({ ...prev, [name]: value }));
@@ -170,7 +179,20 @@ const ProductItem: React.FC<CustomComponentPropsWidthProductType<ProductType>> =
       p={4}
       maxW="md"
     >
-      <Image src={img} alt={title} />
+      {isEditReturn({
+        edited: (
+          <Flex flexDirection={'column'} alignContent={'center'} justifyContent={'center'}>
+            <Box>
+              {' '}
+              <Image src={img} alt={title} />
+            </Box>
+            <Box>
+              <Input onChange={(e) => handleChange(e)} type="file" name={'img'} />
+            </Box>
+          </Flex>
+        ),
+        stable: <Image src={img} alt={title} />,
+      })}
       <Box
         mt={2}
         fontWeight="semibold"
