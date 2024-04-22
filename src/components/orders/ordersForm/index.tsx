@@ -30,6 +30,8 @@ const TotalWeightFromProductMemoized = memo(TotalWeightFromProduct);
 
 const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
   const [includeCatPic, setIncludeCatPic] = useState<boolean>(false);
+  const [includeSale, setIncludeSale] = useState<boolean>(false);
+
   const [selectedCountry, setSelectedCountry] = useState<Countries | ''>('');
   const [selectedFee, setSelectedFee] = useState<string>('0');
 
@@ -42,7 +44,15 @@ const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
     initialValues: FormikOrders.initialValues,
     validationSchema: FormikOrders.validationSchema(selectedAddress, includeCatPic),
     onSubmit: async (values, { resetForm }) => {
-      const { userNameAndLastName, shipPrice, orderItems, catExistConfirmPicUrl, ...rest } = values;
+      const {
+        userNameAndLastName,
+        shipPrice,
+        orderItems,
+        priceWithSale,
+        totalPrice,
+        catExistConfirmPicUrl,
+        ...rest
+      } = values;
       const imgUrl = catExistConfirmPicUrl
         ? (await uploadProductFileImg(catExistConfirmPicUrl)).imgUrl
         : '';
@@ -72,7 +82,7 @@ const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
           catExistConfirmPicUrl: imgUrl,
           userLastName,
           orderItems: JSON.stringify(orderItems),
-          totalPrice: shipPrice + values.price,
+          totalPrice,
           isCatExist: includeCatPic,
         };
         await Orders.createOrder(userDataUniqueId, data);
@@ -151,10 +161,21 @@ const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
     const calcWeight = data.reduce((acc, val) => acc + val.weight * val.count, 0);
     const activePrice = formik.values.activePrice;
 
+    // Apply discount if includeSale is true
+    let finalPrice = 0;
+    if (includeSale) {
+      // Apply a discount of 10 percent
+      finalPrice = calcPrice * 0.9; // 10% discount
+      // Set the price with sale value
+      formik.setFieldValue('priceWithSale', finalPrice);
+    }
+
+    const rightPrice = finalPrice !== 0 ? finalPrice : calcPrice;
+
     formik.setFieldValue('orderItems', data);
     formik.setFieldValue('price', calcPrice);
     formik.setFieldValue('totalWeight', calcWeight);
-    handleCalcTotalPrice(calcWeight, calcPrice, activePrice);
+    handleCalcTotalPrice(calcWeight, rightPrice, activePrice);
   };
 
   const generateEightDigitDecimal = () => {
@@ -179,6 +200,7 @@ const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
 
     formik.setFieldValue('freeDelivery', freeShip);
     formik.setFieldValue('shipPrice', rightShipPrice);
+    formik.setFieldValue('totalPrice', price + rightShipPrice);
   };
   const handleOrderComeFromChange = (value: string) => {
     formik.setFieldValue('orderComeFrom', value);
@@ -196,11 +218,14 @@ const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
     { name: 'userCountry', label: 'Країна', type: 'text' },
     { name: 'orderComeFrom', label: 'Звідки замовлення', type: 'text' },
     { name: 'userNickname', label: 'Нік-нейм юзера', type: 'text' },
+    { name: 'saleCheckBox', label: 'Додати знижку', type: 'checkbox' },
     { name: 'isCatExist', label: 'Є котик', type: 'checkbox' },
     { name: 'orderItems', label: 'Елементи замовлення', type: 'text' },
     { name: 'price', label: 'Ціна', type: 'text' },
     { name: 'shipPrice', label: 'Податок на доставку', type: 'text' },
+    { name: 'priceWithSale', label: 'Ціна зі знижкою', type: 'text' },
     { name: 'totalWeight', label: 'Вага', type: 'text' },
+    { name: 'totalPrice', label: 'Загальна ціна', type: 'text' },
   ];
 
   const renderFields = ({ name, label, type }: (typeof inputFields)[0]) => {
@@ -242,6 +267,25 @@ const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
             )}
           </FormControl>
         );
+      case 'saleCheckBox':
+        return (
+          <FormControl
+            mt={5}
+            key={name}
+            display="flex"
+            alignItems="center"
+            style={{ marginRight: 'auto' }}
+          >
+            <Checkbox
+              type="checkbox"
+              name="saleCheckBox"
+              isChecked={includeSale}
+              onChange={() => setIncludeSale(!includeSale)}
+              mr={2}
+            />
+            <Text>Додати знижку</Text>
+          </FormControl>
+        );
       case 'orderNumber':
         return (
           <FormControl mt={5} key={name}>
@@ -281,10 +325,28 @@ const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
         );
       case 'totalPrice':
         return (
-          <Text borderBottom="1px" borderColor="black" mt={5} key={name}>
+          <Text
+            fontSize={'23px'}
+            color={'purple'}
+            borderBottom="1px"
+            borderColor="black"
+            mt={5}
+            key={name}
+          >
             {' '}
-            Ціна з податком {val}
+            ЗАГАЛЬНА ЦІНА {val}
           </Text>
+        );
+      case 'priceWithSale':
+        return (
+          <>
+            {includeSale && (
+              <Text borderBottom="1px" borderColor="black" mt={5} key={name}>
+                {' '}
+                Ціна зі знижкою {val}
+              </Text>
+            )}
+          </>
         );
       case 'totalWeight':
         return (
@@ -346,6 +408,7 @@ const OrderAddForm = ({ productItems }: { productItems: ProductType[] }) => {
             <TotalWeightFromProductMemoized
               condition={!!formik.values.userCountry}
               activePrice={formik.values.activePrice}
+              isSaleAdded={includeSale}
               activeCountry={Countries.Austria}
               setData={(data) => handleTransformData(data)}
               name={name as keyof ProductType}

@@ -12,7 +12,7 @@ export type OrderTypeWithoutExtraFields = Omit<
   | 'op_isActualize'
   | 'userName'
   | 'userLastName'
-> & { userNameAndLastName: string; shipPrice: number };
+> & { userNameAndLastName: string; shipPrice: number; priceWithSale: number };
 
 const initialValues: OrderTypeWithoutExtraFields = {
   userNameAndLastName: '',
@@ -35,6 +35,7 @@ const initialValues: OrderTypeWithoutExtraFields = {
   shipPrice: 0,
   totalWeight: 0,
   orderItems: '',
+  priceWithSale: 0,
   price: 0,
 };
 

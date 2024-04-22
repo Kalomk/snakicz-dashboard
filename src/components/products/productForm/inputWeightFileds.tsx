@@ -33,11 +33,13 @@ type CartTypes =
       type: 'col';
       activeCountry?: Countries;
       activePrice?: ActualPriceType;
+      isSaleAdded: boolean;
     }
   | {
       type: 'cart';
       activeCountry: Countries;
       activePrice: ActualPriceType;
+      isSaleAdded: boolean;
     };
 
 type TotalWrightFromProductProps = PostInput & {
@@ -158,37 +160,29 @@ export const InputWeightList = ({ setValue }: SetValueType) => {
   );
 };
 
-export const TotalWeightFromProduct = ({
-  name,
-  label,
-  productItems,
+//cart picker
+
+const CartItemPicker = ({
+  type,
+  rightProductsArray,
   setData,
-  condition,
-  type = 'col',
-  activeCountry = Countries.Poland,
-  activePrice = 'zł',
-}: TotalWrightFromProductProps) => {
-  const [productWeightsMap, setProductWeightsMap] = useState<{ [title: string]: number[] }>({});
+  activeCountry,
+  activePrice,
+  isSaleAdded,
+}: {
+  type: 'col' | 'cart';
+  rightProductsArray: ProductType[];
+  setData: (item: CartItem[]) => void;
+  activeCountry: Countries;
+  activePrice: ActualPriceType;
+  isSaleAdded: boolean;
+}) => {
+  const [schema, setSchema] = useState<FilterSchemaType<ProductType>>(filterSchemaProducts[0]);
   const [products, setProducts] = useState<CartItem[]>([]);
-  const { isOpen, onToggle } = useDisclosure();
+  const [productWeightsMap, setProductWeightsMap] = useState<{ [title: string]: number[] }>({});
 
   //clear array if active price or active country change
-  useEffect(() => setProducts([]), [activePrice, activeCountry]);
-
-  //filter or not the array of products
-  const sortedItems = [...productItems]
-    .sort((a, b) => {
-      if (a.category === 3 && b.category !== 3) {
-        return 1; // Move item with category 3 to the end
-      } else if (a.category !== 3 && b.category === 3) {
-        return -1; // Move item with category 3 to the end
-      } else {
-        return 0; // No change in relative order
-      }
-    })
-    .filter((si) => si.isEnable !== false);
-  const rightProductsArray =
-    type === 'col' ? sortedItems.filter((item) => item.category !== 3) : sortedItems;
+  useEffect(() => setProducts([]), [activePrice, activeCountry, isSaleAdded]);
 
   //component functions
 
@@ -287,7 +281,6 @@ export const TotalWeightFromProduct = ({
   const onHandleChangeIsDivided = (value: boolean, cartItem: CartItem) => {
     const newArray = [...products];
 
-    console.log('1');
     //find index
     const existingItemIndex = newArray.findIndex(
       (obj) => obj.title === cartItem.title && obj.weight === cartItem.weight
@@ -299,136 +292,157 @@ export const TotalWeightFromProduct = ({
     setData(newArray);
   };
 
-  //cart picker
-
-  const CartItemPicker = () => {
-    const [schema, setSchema] = useState<FilterSchemaType<ProductType>>(filterSchemaProducts[0]);
-
-    return (
+  return (
+    <Box>
       <Box>
-        <Box>
-          <HStack wrap={'wrap'}>
-            {filterSchemaProducts.map((btn) => {
-              if (type === 'col' && btn.name === 'Сети') {
-                return null;
-              }
-              return (
-                <Button
-                  colorScheme={'green'}
-                  variant={schema.name === btn.name ? 'solid' : 'outline'}
-                  onClick={() => {
-                    setSchema(btn);
-                  }}
-                >
-                  {btn.name}
-                </Button>
-              );
-            })}
-          </HStack>
-        </Box>
-        {rightProductsArray.filter(schema.filterFunc).map((item) => {
-          const rightWeight =
-            productWeightsMap[item.title] != undefined
-              ? productWeightsMap[item.title]
-              : item.weight;
-
-          const settedWeight = [...new Set(rightWeight)];
-          const subValuesObj = calculateTotalSubtractedValues(item.title, item.category);
-          return (
-            <ListItem key={item.id} display="flex" justifyContent={'center'} alignItems="center">
-              <Image src={item.img} alt={item.title} boxSize="50px" mr={4} />
-              <Flex flexDirection={'column'} alignItems={'center'} justifyContent={'center'}>
-                <Text marginBottom={2} fontWeight={'800'} textAlign={'center'}>
-                  {item.title}
-                </Text>
-                <Flex gap={2} justifyContent={'center'} alignContent={'center'}>
-                  <Text marginBottom={2} fontWeight={'500'} textAlign={'center'}>
-                    {item.totalWeightProduct} {checkIfSet(item.category)}
-                  </Text>
-                  {subValuesObj && subValuesObj.component}
-                </Flex>
-                <Flex gap={2} flexWrap={'wrap'} justifyContent={'center'} alignContent={'center'}>
-                  {settedWeight.map((w) => {
-                    const selectedProduct = findCartItem(item.title, w);
-                    const checkWeight = item.category === 3 ? 1 : w;
-                    return (
-                      <Flex
-                        key={w}
-                        alignItems={'center'}
-                        justifyContent={'center'}
-                        flexDirection={'column'}
-                      >
-                        <Button
-                          isDisabled={
-                            selectedProduct?.weight !== checkWeight && subValuesObj
-                              ? item.totalWeightProduct < subValuesObj.rightReducedValues ||
-                                subValuesObj.rightReducedValues + checkWeight >
-                                  item.totalWeightProduct
-                              : false || item.totalWeightProduct < checkWeight
-                          }
-                          marginTop={2}
-                          onClick={() => handleSelectWeightChange(w, item)}
-                          colorScheme={selectedProduct?.weight === w ? 'teal' : 'gray'}
-                        >
-                          {w}
-                        </Button>
-                        {type === 'cart' ? (
-                          <FormControl mt={2}>
-                            <Flex justifyContent={'center'} alignContent={'center'}>
-                              <FormLabel>Окремо?</FormLabel>
-                              <Checkbox
-                                isDisabled={!selectedProduct}
-                                isChecked={selectedProduct?.isDivided}
-                                onChange={(e) =>
-                                  onHandleChangeIsDivided(e.target.checked, selectedProduct!)
-                                }
-                              />
-                            </Flex>
-                          </FormControl>
-                        ) : null}
-                        {type === 'cart' ? (
-                          <VStack marginTop={4} align="center">
-                            <HStack>
-                              <Button
-                                isDisabled={!selectedProduct || selectedProduct.count < 2}
-                                size={'sm'}
-                                onClick={() => incrementOrDecrement('dec', selectedProduct!)}
-                              >
-                                -
-                              </Button>
-                              <Text>{selectedProduct?.count ?? 0}</Text>
-                              <Button
-                                isDisabled={
-                                  !selectedProduct ||
-                                  (subValuesObj
-                                    ? item.totalWeightProduct <=
-                                      subValuesObj.rightReducedValues + checkWeight
-                                    : false)
-                                }
-                                size={'sm'}
-                                onClick={() => incrementOrDecrement('inc', selectedProduct!)}
-                              >
-                                +
-                              </Button>
-                            </HStack>
-                          </VStack>
-                        ) : null}
-                      </Flex>
-                    );
-                  })}
-                </Flex>
-                <Box as="div" marginTop={2}>
-                  <InputWeightList
-                    setValue={(newV) => handleProductWeightChange(item.title, rightWeight, newV)}
-                  />
-                </Box>
-              </Flex>
-            </ListItem>
-          );
-        })}
+        <HStack wrap={'wrap'}>
+          {filterSchemaProducts.map((btn) => {
+            if (type === 'col' && btn.name === 'Сети') {
+              return null;
+            }
+            return (
+              <Button
+                colorScheme={'green'}
+                variant={schema.name === btn.name ? 'solid' : 'outline'}
+                onClick={() => {
+                  setSchema(btn);
+                }}
+              >
+                {btn.name}
+              </Button>
+            );
+          })}
+        </HStack>
       </Box>
-    );
-  };
+      {rightProductsArray.filter(schema.filterFunc).map((item) => {
+        const rightWeight =
+          productWeightsMap[item.title] != undefined ? productWeightsMap[item.title] : item.weight;
+
+        const settedWeight = [...new Set(rightWeight)];
+        const subValuesObj = calculateTotalSubtractedValues(item.title, item.category);
+        return (
+          <ListItem key={item.id} display="flex" justifyContent={'center'} alignItems="center">
+            <Image src={item.img} alt={item.title} boxSize="50px" mr={4} />
+            <Flex flexDirection={'column'} alignItems={'center'} justifyContent={'center'}>
+              <Text marginBottom={2} fontWeight={'800'} textAlign={'center'}>
+                {item.title}
+              </Text>
+              <Flex gap={2} justifyContent={'center'} alignContent={'center'}>
+                <Text marginBottom={2} fontWeight={'500'} textAlign={'center'}>
+                  {item.totalWeightProduct} {checkIfSet(item.category)}
+                </Text>
+                {subValuesObj && subValuesObj.component}
+              </Flex>
+              <Flex gap={2} flexWrap={'wrap'} justifyContent={'center'} alignContent={'center'}>
+                {settedWeight.map((w) => {
+                  const selectedProduct = findCartItem(item.title, w);
+                  const checkWeight = item.category === 3 ? 1 : w;
+                  return (
+                    <Flex
+                      key={w}
+                      alignItems={'center'}
+                      justifyContent={'center'}
+                      flexDirection={'column'}
+                    >
+                      <Button
+                        isDisabled={
+                          selectedProduct?.weight !== checkWeight && subValuesObj
+                            ? item.totalWeightProduct < subValuesObj.rightReducedValues ||
+                              subValuesObj.rightReducedValues + checkWeight >
+                                item.totalWeightProduct
+                            : false || item.totalWeightProduct < checkWeight
+                        }
+                        marginTop={2}
+                        onClick={() => handleSelectWeightChange(w, item)}
+                        colorScheme={selectedProduct?.weight === w ? 'teal' : 'gray'}
+                      >
+                        {w}
+                      </Button>
+                      {type === 'cart' ? (
+                        <FormControl mt={2}>
+                          <Flex justifyContent={'center'} alignContent={'center'}>
+                            <FormLabel>Окремо?</FormLabel>
+                            <Checkbox
+                              isDisabled={!selectedProduct}
+                              isChecked={selectedProduct?.isDivided}
+                              onChange={(e) =>
+                                onHandleChangeIsDivided(e.target.checked, selectedProduct!)
+                              }
+                            />
+                          </Flex>
+                        </FormControl>
+                      ) : null}
+                      {type === 'cart' ? (
+                        <VStack marginTop={4} align="center">
+                          <HStack>
+                            <Button
+                              isDisabled={!selectedProduct || selectedProduct.count < 2}
+                              size={'sm'}
+                              onClick={() => incrementOrDecrement('dec', selectedProduct!)}
+                            >
+                              -
+                            </Button>
+                            <Text>{selectedProduct?.count ?? 0}</Text>
+                            <Button
+                              isDisabled={
+                                !selectedProduct ||
+                                (subValuesObj
+                                  ? item.totalWeightProduct <=
+                                    subValuesObj.rightReducedValues + checkWeight
+                                  : false)
+                              }
+                              size={'sm'}
+                              onClick={() => incrementOrDecrement('inc', selectedProduct!)}
+                            >
+                              +
+                            </Button>
+                          </HStack>
+                        </VStack>
+                      ) : null}
+                    </Flex>
+                  );
+                })}
+              </Flex>
+              <Box as="div" marginTop={2}>
+                <InputWeightList
+                  setValue={(newV) => handleProductWeightChange(item.title, rightWeight, newV)}
+                />
+              </Box>
+            </Flex>
+          </ListItem>
+        );
+      })}
+    </Box>
+  );
+};
+
+export const TotalWeightFromProduct = ({
+  name,
+  label,
+  productItems,
+  setData,
+  condition,
+  type = 'col',
+  activeCountry = Countries.Poland,
+  activePrice = 'zł',
+  isSaleAdded,
+}: TotalWrightFromProductProps) => {
+  const { isOpen, onToggle } = useDisclosure();
+
+  //filter or not the array of products
+  const sortedItems = [...productItems]
+    .sort((a, b) => {
+      if (a.category === 3 && b.category !== 3) {
+        return 1; // Move item with category 3 to the end
+      } else if (a.category !== 3 && b.category === 3) {
+        return -1; // Move item with category 3 to the end
+      } else {
+        return 0; // No change in relative order
+      }
+    })
+    .filter((si) => si.isEnable !== false);
+  const rightProductsArray =
+    type === 'col' ? sortedItems.filter((item) => item.category !== 3) : sortedItems;
 
   return (
     <FormControl mt={5} id={`${name}-id`}>
@@ -436,7 +450,18 @@ export const TotalWeightFromProduct = ({
       {condition && (
         <Collapse in={isOpen} transition={{ exit: { delay: 1 }, enter: { duration: 0.5 } }}>
           <List marginBottom={4} spacing={3}>
-            {!rightProductsArray ? <div>Нема товарів</div> : <CartItemPicker />}
+            {!rightProductsArray ? (
+              <div>Нема товарів</div>
+            ) : (
+              <CartItemPicker
+                type={type}
+                activePrice={activePrice}
+                setData={setData}
+                isSaleAdded={isSaleAdded}
+                activeCountry={activeCountry}
+                rightProductsArray={rightProductsArray}
+              />
+            )}
           </List>
         </Collapse>
       )}
