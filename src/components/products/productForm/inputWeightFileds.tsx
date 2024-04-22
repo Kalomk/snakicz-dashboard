@@ -33,13 +33,13 @@ type CartTypes =
       type: 'col';
       activeCountry?: Countries;
       activePrice?: ActualPriceType;
-      isSaleAdded: boolean;
+      isSaleAdded?: boolean;
     }
   | {
       type: 'cart';
       activeCountry: Countries;
       activePrice: ActualPriceType;
-      isSaleAdded: boolean;
+      isSaleAdded?: boolean;
     };
 
 type TotalWrightFromProductProps = PostInput & {
@@ -425,7 +425,7 @@ export const TotalWeightFromProduct = ({
   type = 'col',
   activeCountry = Countries.Poland,
   activePrice = 'zł',
-  isSaleAdded,
+  isSaleAdded = false,
 }: TotalWrightFromProductProps) => {
   const { isOpen, onToggle } = useDisclosure();
 
