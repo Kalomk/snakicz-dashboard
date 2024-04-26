@@ -133,10 +133,10 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
     isActualize: 'Актуалізувано користувача',
   };
 
-  const handleDeleteOrder = async (orderNumber: string, cartItems: CartItem[]) => {
+  const handleDeleteOrder = async (orderNumber: string, cartItems: CartItem[],isDeleteWithoutChangeQuan:boolean) => {
     try {
       await Orders.deleteOrder(orderNumber);
-      await Products.addQuantityOfProducts(cartItems);
+      isDeleteWithoutChangeQuan ?  undefined : await Products.addQuantityOfProducts(cartItems) ;
     } catch (e) {
       console.log(e);
     } finally {
@@ -384,15 +384,24 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
           <Box textAlign={'center'}>
             <Text fontSize={20}>Видалити замовлення?</Text>
           </Box>
-          <Button mt={5} onClick={onCloseModalDelete}>
-            Ні, не видаляти
+          <Button mt={5} onClick={() => {
+              try {
+                handleDeleteOrder(orderNumber, orderItemsParsed,true);
+              } catch (e) {
+                console.log(e);
+              } finally {
+                onCloseModalDelete();
+                window.location.reload();
+              }
+            }}>
+            Видалити без зміни кількості
           </Button>
           <Button
             mt={6}
             colorScheme="red"
             onClick={() => {
               try {
-                handleDeleteOrder(orderNumber, orderItemsParsed);
+                handleDeleteOrder(orderNumber, orderItemsParsed,false);
               } catch (e) {
                 console.log(e);
               } finally {
@@ -401,7 +410,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
               }
             }}
           >
-            Так, видалити
+           Видалити повністю (зі зміною даних)
           </Button>
         </Flex>
       </ModalComponent>
