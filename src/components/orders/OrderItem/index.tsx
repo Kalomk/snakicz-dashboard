@@ -39,6 +39,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
     catExistConfirmPicUrl,
     paymentConfirmPicUrl,
     userAddress,
+    email,
     userCity,
     userName,
     userCountry,
@@ -476,6 +477,7 @@ const OrderComponent: React.FC<CustomComponentProps<OrderType>> = ({ data }) => 
           </Text>
           <Text>{`Країна: ${userCountry}`}</Text>
           <Text>{`Місто: ${userCity}`}</Text>
+          <Text>{`Емейл: ${email}`}</Text>
           <Text>{`Індекс міста: ${userIndexCity}`}</Text>
           <Text>{`Загальна вага: ${totalWeight}г`}</Text>
           {data.postSendNumber !== '' ? (
